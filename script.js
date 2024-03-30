@@ -84,6 +84,7 @@ function switchTo3DView() {
     document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View';
     linesArray.forEach(drawWallIn3DView);
     document.getElementById('threeDOutlineBtn').style.display = 'block'
+    document.getElementById('threeDOutlineBtn').textContent = `Wall Outline - ${material.wireframe ? "ON" : "OFF"}`
 
   }
 
