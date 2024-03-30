@@ -109,7 +109,7 @@ function switchTo3DView() {
   } else {
     // Switch to PerspectiveCamera and enable OrbitControls
     camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-    camera.position.z = 5;
+    camera.position.z = 3;
     controls = new OrbitControls(camera, renderer.domElement);
     document.getElementById('3DToggleBtn').textContent = 'Change to 2D View';
 
