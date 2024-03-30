@@ -7,7 +7,7 @@ canvas {
   /* position: fixed; */
   display: block;
 }
-button {
+#threeDToggleBtn{
   position: absolute;
   top: 10px;
   left: 10px;
@@ -15,5 +15,16 @@ button {
   background-color: black;
   color: white;
   border: none;
+  cursor: pointer;
+}
+#threeDOutlineBtn{
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: none;
   cursor: pointer;
 }
