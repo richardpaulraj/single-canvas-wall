@@ -11,7 +11,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-const material = new THREE.MeshBasicMaterial({ color: 'grey' , wireframe:true});
+const material = new THREE.MeshBasicMaterial({ color: 'grey'});
 const lineMaterial = new THREE.LineBasicMaterial({ color: 'black' });
 
 
@@ -47,11 +47,6 @@ function onMouseUp(event) {
 }
 
 // Function to handle mouse move event
-function onMouseMove(event) {
-  if (isMouseDown) {
-    // Only add points on mouse down and mouse up, not on mouse move
-  }
-}
 
 function addPoint(event) {
   // Calculate mouse position in normalized device coordinates (-1 to 1)
@@ -152,7 +147,6 @@ linesArray.forEach((line) => {
 // Add event listeners for mouse down, move, and up
 renderer.domElement.addEventListener('mousedown', onMouseDown);
 renderer.domElement.addEventListener('mouseup', onMouseUp);
-renderer.domElement.addEventListener('mousemove', onMouseMove);
 renderer.setClearColor('white');
 
 // Position the camera
