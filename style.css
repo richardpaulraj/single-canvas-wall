@@ -7,7 +7,7 @@ canvas {
   /* position: fixed; */
   display: block;
 }
-#threeDToggleBtn{
+#threeDToggleBtn {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -17,7 +17,7 @@ canvas {
   border: none;
   cursor: pointer;
 }
-#threeDOutlineBtn{
+#threeDOutlineBtn {
   position: absolute;
   top: 50px;
   left: 10px;
@@ -27,4 +27,56 @@ canvas {
   border: none;
   display: none;
   cursor: pointer;
+}
+#bottomRightTaskBtn {
+  position: absolute;
+  top: 90px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: none;
+  cursor: pointer;
+}
+#topLeftTaskBtn {
+  position: absolute;
+  top: 130px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: none;
+  cursor: pointer;
+}
+#correctedWallTaskBtn {
+  position: absolute;
+  top: 170px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: none;
+  cursor: pointer;
+}
+#wallWidth {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: block;
+}
+#wallWidth input {
+  cursor: pointer;
+  margin-left: 5px;
+}
+#wallWidth div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
