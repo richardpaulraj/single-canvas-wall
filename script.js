@@ -97,11 +97,11 @@ function switchTo3DView() {
       alert('Draw something to see in 3D View')
       return
     }
-    // camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000)
-    camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
+    camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000)
+    // camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
 
     camera.position.z = 3
-    // controls = new OrbitControls(camera, renderer.domElement)
+    controls = new OrbitControls(camera, renderer.domElement)
     document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View'
     linesArray.forEach((e) => drawWallIn3DView(e))
     linesArray.forEach((e) => drawLineIn2DView(e))
