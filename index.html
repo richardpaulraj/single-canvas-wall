@@ -10,8 +10,6 @@
   <body>
     <button id="threeDToggleBtn">Change to 3D View</button>
     <button id="threeDOutlineBtn">Wall Outline - OFF</button>
-    <button id="bottomRightTaskBtn">Bottom Right</button>
-    <button id="topLeftTaskBtn">Top Left</button>
     <button id="correctedWallTaskBtn">Corrected Wall</button>
     <button id="wallWidth">
       <div>
@@ -27,13 +25,15 @@
             type="radio"
             id="wallWidthRange"
             name="alignmentsRadioBtn"
-          />Top Left</label
+            value="Top"
+          />Top</label
         >
         <label
           ><input
             type="radio"
             id="wallWidthRange"
             name="alignmentsRadioBtn"
+            value="Center"
             checked
           />Center</label
         >
@@ -42,7 +42,8 @@
             type="radio"
             id="wallWidthRange"
             name="alignmentsRadioBtn"
-          />Bottom Left</label
+            value="Bottom"
+          />Bottom</label
         >
       </div>
     </button>

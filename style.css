@@ -28,31 +28,9 @@ canvas {
   display: none;
   cursor: pointer;
 }
-#bottomRightTaskBtn {
-  position: absolute;
-  top: 90px;
-  left: 10px;
-  padding: 10px;
-  background-color: black;
-  color: white;
-  border: none;
-  display: none;
-  cursor: pointer;
-}
-#topLeftTaskBtn {
-  position: absolute;
-  top: 130px;
-  left: 10px;
-  padding: 10px;
-  background-color: black;
-  color: white;
-  border: none;
-  display: none;
-  cursor: pointer;
-}
 #correctedWallTaskBtn {
   position: absolute;
-  top: 170px;
+  top: 90px;
   left: 10px;
   padding: 10px;
   background-color: black;

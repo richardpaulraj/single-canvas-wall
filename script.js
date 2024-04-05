@@ -6,6 +6,7 @@ const aspect = window.innerWidth / window.innerHeight
 let camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById('canvas'),
+  antialias: true,
 })
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setClearColor('white')
@@ -13,25 +14,25 @@ renderer.setClearColor('white')
 camera.position.z = 5
 let controls = null
 
-const materials = {
-  material: new THREE.MeshBasicMaterial({
-    color: 'grey',
-    wireframe: false,
-  }),
-  lineMaterial: new THREE.MeshBasicMaterial({
-    color: 'red',
-    wireframe: false,
-  }),
-}
+const material = new THREE.MeshBasicMaterial({
+  color: 'grey',
+  wireframe: false,
+})
 
 const mousePoints = [] //This array stores the 3D coordinates of all the points that make up the line being drawn.
 const linesArray = []
 let isMouseDown = false
 let is3DView = false
 let currentWidth = parseFloat(document.getElementById('wallWidthRange').value)
+let currentAlignment = 'Center'
 
-function addLineData(startPoint, endPoint, lineWidth) {
-  linesArray.push({ start: startPoint, end: endPoint, width: lineWidth })
+function addLineData(startPoint, endPoint, lineWidth, alignment) {
+  linesArray.push({
+    start: startPoint,
+    end: endPoint,
+    width: lineWidth,
+    alignment: alignment,
+  })
 }
 
 function clearScene() {
@@ -71,10 +72,12 @@ const mouseClickActivity = {
       addLineData(
         mousePoints[mousePoints.length - 2],
         mousePoints[mousePoints.length - 1],
-        currentWidth
+        currentWidth,
+        currentAlignment
       )
       clearScene()
-      linesArray.forEach((line) => drawLineIn2DView(line))
+      console.log(linesArray)
+      linesArray.forEach((line) => drawWalls(line))
     }
   },
 }
@@ -86,18 +89,16 @@ function switchTo3DView() {
     camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
     camera.position.z = 5
     controls = null
-    linesArray.forEach(drawLineIn2DView)
+    linesArray.forEach(drawWalls)
 
     document.getElementById('threeDToggleBtn').textContent = 'Change to 3D View'
     document.getElementById('threeDOutlineBtn').style.display = 'none'
-    document.getElementById('bottomRightTaskBtn').style.display = 'none'
-    document.getElementById('topLeftTaskBtn').style.display = 'none'
     document.getElementById('correctedWallTaskBtn').style.display = 'none'
     document.getElementById('wallWidth').style.display = 'block'
     document.getElementById('clearAllBtn').style.display = 'block'
     document.getElementById('alignments').style.display = 'block'
 
-    materials.material.wireframe = false
+    material.wireframe = false
   } else {
     if (linesArray.length === 0) {
       alert('Draw something to see in 3D View')
@@ -109,18 +110,16 @@ function switchTo3DView() {
     camera.position.z = 3
     controls = new OrbitControls(camera, renderer.domElement)
     document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View'
-    linesArray.forEach((e) => drawWallIn3DView(e))
-    // linesArray.forEach((e) => drawLineIn2DView(e))
+    linesArray.forEach((e) => drawWalls(e))
+
     document.getElementById('threeDOutlineBtn').style.display = 'block'
-    document.getElementById('bottomRightTaskBtn').style.display = 'block'
-    document.getElementById('topLeftTaskBtn').style.display = 'block'
     document.getElementById('correctedWallTaskBtn').style.display = 'block'
     document.getElementById('wallWidth').style.display = 'none'
     document.getElementById('clearAllBtn').style.display = 'none'
     document.getElementById('alignments').style.display = 'none'
 
     document.getElementById('threeDOutlineBtn').textContent = `Wall Outline - ${
-      materials.material.wireframe ? 'ON' : 'OFF'
+      material.wireframe ? 'ON' : 'OFF'
     }`
   }
 
@@ -129,62 +128,88 @@ function switchTo3DView() {
 
 function switchTo3DOutline() {
   if (is3DView) {
-    materials.material.wireframe = !materials.material.wireframe
+    material.wireframe = !material.wireframe
     document.getElementById('threeDOutlineBtn').textContent = `Wall Outline - ${
-      materials.material.wireframe ? 'ON' : 'OFF'
+      material.wireframe ? 'ON' : 'OFF'
     }`
   }
 }
 
-function drawLineIn2DView(line) {
-  const direction = new THREE.Vector3().copy(line.end).sub(line.start)
-  const length = direction.length()
-
-  const thickness = 0.025 * line.width
-  const height = 0.025 * line.width
-
-  const geometry = new THREE.BoxGeometry(thickness, height, length)
-  const lineObject = new THREE.Mesh(geometry, materials.lineMaterial)
-  lineObject.position.copy(line.start)
-
-  // Rotate the line object to align it with the direction vector
-  lineObject.lookAt(line.end)
-
-  // Add half the direction vector to the position to align the corner of the box with the start point
-  const halfDirection = direction.clone().multiplyScalar(0.5)
-  lineObject.position.add(halfDirection)
-
-  scene.add(lineObject)
-}
-function drawWallIn3DView(line) {
+function drawWalls(line) {
   const direction = new THREE.Vector3()
     .copy(line.end)
     .sub(line.start)
     .normalize()
 
-  const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0) // In 2D space, a perpendicular vector to a vector (x, y) is (-y, x) or (y, -x)
+  const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
   const wallWidth = 0.025 * line.width
 
-  const p1 = new THREE.Vector3()
-    .copy(line.start)
-    .addScaledVector(perpendicular, wallWidth / 2) //addScaledVector is used to position each corner of the wall based on the direction of the perpendicular vector and the wallWidth.
-  const p2 = new THREE.Vector3()
-    .copy(line.end)
-    .addScaledVector(perpendicular, wallWidth / 2)
-  const p3 = new THREE.Vector3()
-    .copy(line.end)
-    .addScaledVector(perpendicular, -wallWidth / 2)
-  const p4 = new THREE.Vector3()
-    .copy(line.start)
-    .addScaledVector(perpendicular, -wallWidth / 2) //addScaledVector is used to position each corner of the wall based on the direction of the perpendicular vector and the wallWidth.
+  if (line.alignment === 'Top') {
+    const p1 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, wallWidth)
+    const p2 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, wallWidth)
+    const p3 = new THREE.Vector3().copy(line.end)
+    // .addScaledVector(perpendicular, -wallWidth / 2)
+    const p4 = new THREE.Vector3().copy(line.start)
+    // .addScaledVector(perpendicular, -wallWidth / 2)
+    const shape = new THREE.Shape([p1, p2, p3, p4])
 
-  const shape = new THREE.Shape([p1, p2, p3, p4])
-  const extrudeSettings = { depth: 0.5, bevelEnabled: false } //depth => wall height
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-  const wall = new THREE.Mesh(geometry, materials.material)
-  scene.add(wall)
+    // Create a geometry by extruding the shape
+    const extrudeSettings = { depth: 0.5, bevelEnabled: false }
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+
+    // Create a mesh using the extruded geometry
+    const wall = new THREE.Mesh(geometry, material)
+    scene.add(wall)
+  } else if (line.alignment === 'Bottom') {
+    const p1 = new THREE.Vector3().copy(line.start)
+    // .addScaledVector(perpendicular, wallWidth / 2)
+    const p2 = new THREE.Vector3().copy(line.end)
+    // .addScaledVector(perpendicular, wallWidth / 2)
+    const p3 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, -wallWidth)
+    const p4 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, -wallWidth)
+
+    const shape = new THREE.Shape([p1, p2, p3, p4])
+
+    // Create a geometry by extruding the shape
+    const extrudeSettings = { depth: 0.5, bevelEnabled: false }
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+
+    // Create a mesh using the extruded geometry
+    const wall = new THREE.Mesh(geometry, material)
+    scene.add(wall)
+  } else if (line.alignment === 'Center') {
+    const p1 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, wallWidth / 2)
+    const p2 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, wallWidth / 2)
+    const p3 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, -wallWidth / 2)
+    const p4 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, -wallWidth / 2)
+
+    const shape = new THREE.Shape([p1, p2, p3, p4])
+
+    // Create a geometry by extruding the shape
+    const extrudeSettings = { depth: 0.5, bevelEnabled: false }
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+
+    // Create a mesh using the extruded geometry
+    const wall = new THREE.Mesh(geometry, material)
+    scene.add(wall)
+  }
 }
-
 function correctedWallIn3DView(line) {
   const direction = new THREE.Vector3()
     .copy(line.end)
@@ -237,60 +262,9 @@ function correctedWallIn3DView(line) {
   const shape = new THREE.Shape([p1, p2, p3, p4])
   const extrudeSettings = { depth: 0.5, bevelEnabled: false } //depth => wall height
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-  const wall = new THREE.Mesh(geometry, materials.material)
+  const wall = new THREE.Mesh(geometry, material)
   scene.add(wall)
 }
-function drawWallIn3DViewBottomRightTask(line) {
-  const direction = new THREE.Vector3()
-    .copy(line.end)
-    .sub(line.start)
-    .normalize()
-
-  const perpendicular = new THREE.Vector3(direction.y, -direction.x, 0) // In 2D space, a perpendicular vector to a vector (x, y) is (-y, x) or (y, -x)
-  const wallWidth = 0.025 * line.width // predefined width
-
-  const p1 = new THREE.Vector3().copy(line.start)
-  const p2 = new THREE.Vector3().copy(line.end)
-  const p3 = new THREE.Vector3()
-    .copy(line.end)
-    .addScaledVector(perpendicular, -wallWidth)
-  const p4 = new THREE.Vector3()
-    .copy(line.start)
-    .addScaledVector(perpendicular, -wallWidth)
-
-  const shape = new THREE.Shape([p1, p2, p3, p4])
-  const extrudeSettings = { depth: 0.5, bevelEnabled: false } //depth => wall height
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-  const wall = new THREE.Mesh(geometry, materials.material)
-  scene.add(wall)
-}
-function drawWallIn3DViewTopLeftTask(line) {
-  const direction = new THREE.Vector3()
-    .copy(line.end)
-    .sub(line.start)
-    .normalize()
-
-  const perpendicular = new THREE.Vector3(direction.y, -direction.x, 0) // In 2D space, a perpendicular vector to a vector (x, y) is (-y, x) or (y, -x)
-  const wallWidth = 0.025 * line.width
-
-  const p1 = new THREE.Vector3()
-    .copy(line.start)
-    .addScaledVector(perpendicular, wallWidth)
-
-  const p2 = new THREE.Vector3()
-    .copy(line.end)
-    .addScaledVector(perpendicular, wallWidth)
-
-  const p3 = new THREE.Vector3().copy(line.end)
-  const p4 = new THREE.Vector3().copy(line.start)
-
-  const shape = new THREE.Shape([p1, p2, p3, p4])
-  const extrudeSettings = { depth: 0.5, bevelEnabled: false } //depth => wall height
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-  const wall = new THREE.Mesh(geometry, materials.material)
-  scene.add(wall)
-}
-
 function allEventListeners() {
   renderer.domElement.addEventListener(
     'mousedown',
@@ -309,28 +283,11 @@ function allEventListeners() {
     .addEventListener('click', switchTo3DOutline)
 
   document
-    .getElementById('bottomRightTaskBtn')
-    .addEventListener('click', () => {
-      if (is3DView) {
-        clearScene()
-        linesArray.forEach((e) => drawWallIn3DViewBottomRightTask(e))
-        // linesArray.forEach((e) => drawLineIn2DView(e))
-      }
-    })
-  document.getElementById('topLeftTaskBtn').addEventListener('click', () => {
-    if (is3DView) {
-      clearScene()
-      linesArray.forEach((e) => drawWallIn3DViewTopLeftTask(e))
-      // linesArray.forEach((e) => drawLineIn2DView(e))
-    }
-  })
-  document
     .getElementById('correctedWallTaskBtn')
     .addEventListener('click', () => {
       if (is3DView) {
         clearScene()
         linesArray.forEach((e) => correctedWallIn3DView(e))
-        // linesArray.forEach((e) => drawLineIn2DView(e))
       }
     })
 
@@ -345,6 +302,15 @@ function allEventListeners() {
       clearScene()
     }
   })
+  document
+    .querySelectorAll('input[name="alignmentsRadioBtn"]')
+    .forEach((radioBtn) => {
+      radioBtn.addEventListener('change', (e) => {
+        const selectedAlignment = e.target.value
+        currentAlignment = selectedAlignment
+        console.log('Selected alignment:', selectedAlignment)
+      })
+    })
 }
 
 function animate() {
