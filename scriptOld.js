@@ -1,7 +1,5 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import WallDrawer from './wallDrawer.js'
-import StaticComponents from './staticComponents.js'
 
 const scene = new THREE.Scene()
 const aspect = window.innerWidth / window.innerHeight
@@ -28,12 +26,6 @@ let is3DView = false
 let currentWidth = parseFloat(document.getElementById('wallWidthRange').value)
 let currentAlignment = 'Center'
 
-///////////
-const wallDrawer = new WallDrawer(scene, material)
-const staticComponents = new StaticComponents(material)
-
-//////////////
-
 function addLineData(startPoint, endPoint, lineWidth, alignment) {
   linesArray.push({
     start: startPoint,
@@ -41,6 +33,10 @@ function addLineData(startPoint, endPoint, lineWidth, alignment) {
     width: lineWidth,
     alignment: alignment,
   })
+}
+
+function clearScene() {
+  scene.children.length = 0
 }
 
 const mouseClickActivity = {
@@ -79,14 +75,141 @@ const mouseClickActivity = {
         currentWidth,
         currentAlignment
       )
-      //   clearScene()
-      staticComponents.clearScene(scene)
+      clearScene()
       console.log(linesArray)
-      linesArray.forEach((line) => wallDrawer.drawWalls(line))
+      linesArray.forEach((line) => drawWalls(line))
     }
   },
 }
 
+function switchTo3DView() {
+  clearScene()
+
+  if (is3DView) {
+    camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
+    camera.position.z = 5
+    controls = null
+    linesArray.forEach(drawWalls)
+
+    document.getElementById('threeDToggleBtn').textContent = 'Change to 3D View'
+    document.getElementById('threeDOutlineBtn').style.display = 'none'
+    document.getElementById('correctedWallTaskBtn').style.display = 'none'
+    document.getElementById('wallWidth').style.display = 'block'
+    document.getElementById('clearAllBtn').style.display = 'block'
+    document.getElementById('alignments').style.display = 'block'
+
+    material.wireframe = false
+  } else {
+    if (linesArray.length === 0) {
+      alert('Draw something to see in 3D View')
+      return
+    }
+    camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000)
+    // camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
+
+    camera.position.z = 3
+    controls = new OrbitControls(camera, renderer.domElement)
+    document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View'
+    linesArray.forEach((e) => drawWalls(e))
+
+    document.getElementById('threeDOutlineBtn').style.display = 'block'
+    document.getElementById('correctedWallTaskBtn').style.display = 'block'
+    document.getElementById('wallWidth').style.display = 'none'
+    document.getElementById('clearAllBtn').style.display = 'none'
+    document.getElementById('alignments').style.display = 'none'
+
+    document.getElementById('threeDOutlineBtn').textContent = `Wall Outline - ${
+      material.wireframe ? 'ON' : 'OFF'
+    }`
+  }
+
+  is3DView = !is3DView
+}
+
+function switchTo3DOutline() {
+  if (is3DView) {
+    material.wireframe = !material.wireframe
+    document.getElementById('threeDOutlineBtn').textContent = `Wall Outline - ${
+      material.wireframe ? 'ON' : 'OFF'
+    }`
+  }
+}
+
+function drawWalls(line) {
+  const direction = new THREE.Vector3()
+    .copy(line.end)
+    .sub(line.start)
+    .normalize()
+
+  const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
+  const wallWidth = 0.025 * line.width
+
+  if (line.alignment === 'Top') {
+    const p1 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, wallWidth)
+    const p2 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, wallWidth)
+    const p3 = new THREE.Vector3().copy(line.end)
+    // .addScaledVector(perpendicular, -wallWidth / 2)
+    const p4 = new THREE.Vector3().copy(line.start)
+    // .addScaledVector(perpendicular, -wallWidth / 2)
+    const shape = new THREE.Shape([p1, p2, p3, p4])
+
+    // Create a geometry by extruding the shape
+    const extrudeSettings = { depth: 0.5, bevelEnabled: false }
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+
+    // Create a mesh using the extruded geometry
+    const wall = new THREE.Mesh(geometry, material)
+    scene.add(wall)
+  } else if (line.alignment === 'Bottom') {
+    const p1 = new THREE.Vector3().copy(line.start)
+    // .addScaledVector(perpendicular, wallWidth / 2)
+    const p2 = new THREE.Vector3().copy(line.end)
+    // .addScaledVector(perpendicular, wallWidth / 2)
+    const p3 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, -wallWidth)
+    const p4 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, -wallWidth)
+
+    const shape = new THREE.Shape([p1, p2, p3, p4])
+
+    // Create a geometry by extruding the shape
+    const extrudeSettings = { depth: 0.5, bevelEnabled: false }
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+
+    // Create a mesh using the extruded geometry
+    const wall = new THREE.Mesh(geometry, material)
+    scene.add(wall)
+  } else if (line.alignment === 'Center') {
+    const p1 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, wallWidth / 2)
+    const p2 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, wallWidth / 2)
+    const p3 = new THREE.Vector3()
+      .copy(line.end)
+      .addScaledVector(perpendicular, -wallWidth / 2)
+    const p4 = new THREE.Vector3()
+      .copy(line.start)
+      .addScaledVector(perpendicular, -wallWidth / 2)
+
+    const shape = new THREE.Shape([p1, p2, p3, p4])
+
+    // Create a geometry by extruding the shape
+    const extrudeSettings = { depth: 0.5, bevelEnabled: false }
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+
+    // Create a mesh using the extruded geometry
+    const wall = new THREE.Mesh(geometry, material)
+    scene.add(wall)
+  }
+}
 function correctedWallIn3DView(line) {
   const direction = new THREE.Vector3()
     .copy(line.end)
@@ -142,54 +265,6 @@ function correctedWallIn3DView(line) {
   const wall = new THREE.Mesh(geometry, material)
   scene.add(wall)
 }
-function switchTo3DView() {
-  //   clearScene()
-  staticComponents.clearScene(scene)
-
-  if (is3DView) {
-    camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
-    camera.position.z = 5
-    controls = null
-    linesArray.forEach((line) => wallDrawer.drawWalls(line))
-
-    document.getElementById('threeDToggleBtn').textContent = 'Change to 3D View'
-
-    document.getElementById(
-      'threeDOutlineBtn'
-    ).textContent = `Wall Outline - OFF`
-    document.getElementById('correctedWallTaskBtn').style.display = 'none'
-    document.getElementById('wallWidth').style.display = 'block'
-    document.getElementById('clearAllBtn').style.display = 'block'
-    document.getElementById('alignments').style.display = 'block'
-
-    material.wireframe = false
-  } else {
-    if (linesArray.length === 0) {
-      alert('Draw something to see in 3D View')
-      return
-    }
-    camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000)
-    // camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000)
-
-    camera.position.z = 3
-    controls = new OrbitControls(camera, renderer.domElement)
-    document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View'
-    linesArray.forEach((e) => wallDrawer.drawWalls(e))
-
-    // document.getElementById('threeDOutlineBtn').style.display = 'block'
-    document.getElementById('correctedWallTaskBtn').style.display = 'block'
-    document.getElementById('wallWidth').style.display = 'none'
-    document.getElementById('clearAllBtn').style.display = 'none'
-    document.getElementById('alignments').style.display = 'none'
-
-    material.wireframe = false
-    document.getElementById('threeDOutlineBtn').textContent = `Wall Outline - ${
-      material.wireframe ? 'ON' : 'OFF'
-    }`
-  }
-
-  is3DView = !is3DView
-}
 function allEventListeners() {
   renderer.domElement.addEventListener(
     'mousedown',
@@ -205,13 +280,13 @@ function allEventListeners() {
     .addEventListener('click', switchTo3DView)
   document
     .getElementById('threeDOutlineBtn')
-    .addEventListener('click', () => staticComponents.switchTo3DOutline())
+    .addEventListener('click', switchTo3DOutline)
 
   document
     .getElementById('correctedWallTaskBtn')
     .addEventListener('click', () => {
       if (is3DView) {
-        staticComponents.clearScene(scene)
+        clearScene()
         linesArray.forEach((e) => correctedWallIn3DView(e))
       }
     })
@@ -224,7 +299,7 @@ function allEventListeners() {
   document.getElementById('clearAllBtn').addEventListener('click', () => {
     if (!is3DView) {
       linesArray.length = 0
-      staticComponents.clearScene(scene)
+      clearScene()
     }
   })
   document
@@ -243,12 +318,9 @@ function animate() {
   if (controls) controls.update()
   renderer.render(scene, camera)
 }
+
 function init() {
   allEventListeners()
   animate()
 }
 init()
-
-/////////////////Checkpoint
-
-//Checkpoint

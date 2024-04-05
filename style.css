@@ -25,7 +25,7 @@ canvas {
   background-color: black;
   color: white;
   border: none;
-  display: none;
+  /* display: block; */
   cursor: pointer;
 }
 #correctedWallTaskBtn {
@@ -41,7 +41,7 @@ canvas {
 }
 #wallWidth {
   position: absolute;
-  top: 50px;
+  top: 90px;
   left: 10px;
   padding: 10px;
   background-color: black;
@@ -61,7 +61,7 @@ canvas {
 
 #alignments {
   position: absolute;
-  top: 90px;
+  top: 130px;
   left: 10px;
   padding: 10px;
   background-color: black;
@@ -84,7 +84,7 @@ canvas {
 
 #clearAllBtn {
   position: absolute;
-  top: 130px;
+  top: 170px;
   left: 10px;
   padding: 10px;
   background-color: black;
