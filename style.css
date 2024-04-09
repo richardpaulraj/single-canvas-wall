@@ -59,7 +59,8 @@ canvas {
   justify-content: center;
 }
 
-#alignments {
+#alignments,
+#wallPatterns {
   position: absolute;
   top: 130px;
   left: 10px;
@@ -69,22 +70,28 @@ canvas {
   border: none;
   display: block;
 }
-#alignments label {
+#alignments label,
+#wallPatterns label {
   cursor: pointer;
   margin-left: 10px;
   display: flex;
 }
-#alignments label input {
+#alignments label input,
+#wallPatterns label input {
   cursor: pointer;
   margin-right: 2px;
 }
-#alignments div {
+#alignments div,
+#wallPatterns div {
   display: flex;
+}
+#wallPatterns {
+  top: 170px;
 }
 
 #clearAllBtn {
   position: absolute;
-  top: 170px;
+  top: 210px;
   left: 10px;
   padding: 10px;
   background-color: black;

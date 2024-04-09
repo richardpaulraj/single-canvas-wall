@@ -77,6 +77,7 @@ const mouseClickActivity = {
       )
       clearScene()
       console.log(linesArray)
+
       linesArray.forEach((line) => drawWalls(line))
     }
   },
