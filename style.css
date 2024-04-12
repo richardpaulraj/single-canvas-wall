@@ -9,7 +9,7 @@ canvas {
 }
 #threeDToggleBtn {
   position: absolute;
-  top: 10px;
+  top: 50px;
   left: 10px;
   padding: 10px;
   background-color: black;
@@ -17,7 +17,7 @@ canvas {
   border: none;
   cursor: pointer;
 }
-#threeDOutlineBtn {
+/* #threeDOutlineBtn {
   position: absolute;
   top: 50px;
   left: 10px;
@@ -25,9 +25,9 @@ canvas {
   background-color: black;
   color: white;
   border: none;
-  /* display: block; */
-  cursor: pointer;
-}
+
+
+} */
 #correctedWallTaskBtn {
   position: absolute;
   top: 90px;
@@ -39,7 +39,8 @@ canvas {
   display: none;
   cursor: pointer;
 }
-#wallWidth {
+#wallWidth,
+#spaceBetweenLines {
   position: absolute;
   top: 90px;
   left: 10px;
@@ -49,18 +50,24 @@ canvas {
   border: none;
   display: block;
 }
-#wallWidth input {
+#wallWidth input,
+#spaceBetweenLines input {
   cursor: pointer;
   margin-left: 5px;
 }
-#wallWidth div {
+#wallWidth div,
+#spaceBetweenLines div {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+#spaceBetweenLines {
+  top: 210px;
+}
 
 #alignments,
-#wallPatterns {
+#wallPatterns,
+#colors {
   position: absolute;
   top: 130px;
   left: 10px;
@@ -71,27 +78,33 @@ canvas {
   display: block;
 }
 #alignments label,
-#wallPatterns label {
+#wallPatterns label,
+#colors label {
   cursor: pointer;
   margin-left: 10px;
   display: flex;
 }
 #alignments label input,
-#wallPatterns label input {
+#wallPatterns label input,
+#colors label input {
   cursor: pointer;
   margin-right: 2px;
 }
 #alignments div,
-#wallPatterns div {
+#wallPatterns div,
+#colors div {
   display: flex;
 }
 #wallPatterns {
   top: 170px;
 }
+#colors {
+  top: 250px;
+}
 
 #clearAllBtn {
   position: absolute;
-  top: 210px;
+  top: 290px;
   left: 10px;
   padding: 10px;
   background-color: black;

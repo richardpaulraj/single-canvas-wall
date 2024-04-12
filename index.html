@@ -9,7 +9,7 @@
   </head>
   <body>
     <button id="threeDToggleBtn">Change to 3D View</button>
-    <button id="threeDOutlineBtn">Wall Outline - OFF</button>
+    <!-- <button id="threeDOutlineBtn">Wall Outline - OFF</button> -->
     <button id="correctedWallTaskBtn">Corrected Wall</button>
     <button id="wallWidth">
       <div>
@@ -57,7 +57,7 @@
             class="wallPattern"
             name="wallPatternRadioBtn"
             value="whiteFill"
-          />White Fill</label
+          />Blank</label
         >
         <label
           ><input
@@ -66,7 +66,7 @@
             name="wallPatternRadioBtn"
             value="solidFill"
             checked
-          />Solid Fill</label
+          />Solid</label
         >
         <label
           ><input
@@ -74,7 +74,59 @@
             class="wallPattern"
             name="wallPatternRadioBtn"
             value="crissCross"
-          />Criss Cross</label
+          />Cross</label
+        >
+        <label
+          ><input
+            type="radio"
+            class="wallPattern"
+            name="wallPatternRadioBtn"
+            value="lines"
+          />Lines</label
+        >
+      </div>
+    </button>
+
+    <button id="spaceBetweenLines">
+      <div>
+        <span>Space between Lines : </span>
+        <input
+          type="range"
+          min="5"
+          max="30"
+          value="5"
+          id="spaceBetweenLinesRange"
+        />
+      </div>
+    </button>
+
+    <button id="colors">
+      <div>
+        <span>Colors : </span>
+        <label
+          ><input
+            type="radio"
+            class="eachColor"
+            name="colorRadioBtn"
+            value="black"
+          />Black</label
+        >
+        <label
+          ><input
+            type="radio"
+            class="eachColor"
+            name="colorRadioBtn"
+            value="red"
+            checked
+          />Red</label
+        >
+        <label
+          ><input
+            type="radio"
+            class="eachColor"
+            name="colorRadioBtn"
+            value="green"
+          />Green</label
         >
       </div>
     </button>

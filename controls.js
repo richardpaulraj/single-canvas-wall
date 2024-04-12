@@ -1,46 +1,32 @@
 // controls.js
 
 import * as THREE from 'three'
-import { switchTo3DView } from './script.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 class MouseClickActivity {
   static isMouseDownVar = false
 
   constructor(
-    camera,
-    scene,
-    is3DView,
     mousePoints,
-    linesArray,
-    currentWidth,
-    currentAlignment,
+    currentAlignment, //This can't be general for all
     addLineData,
     clearScene,
     wallDrawer,
-    material,
-    switchTo3DOutline,
-    aspect,
-    renderer
+    toggleBtns2D,
+    toggleBtns3D
   ) {
-    this.camera = camera
-    this.scene = scene
-    this.is3DView = is3DView
     this.mousePoints = mousePoints
-    this.linesArray = linesArray
-    this.currentWidth = currentWidth
     this.currentAlignment = currentAlignment
     this.addLineData = addLineData
     this.clearScene = clearScene
     this.wallDrawer = wallDrawer
-    this.material = material // Assign material here
-    this.switchTo3DOutline = switchTo3DOutline
+
+    this.toggleBtns2D = toggleBtns2D
+    this.toggleBtns3D = toggleBtns3D
 
     // Declare temporaryLine as a class property and initialize it as null
     this.temporaryLine = null
     this.lastMouseDownPosition = null // Store the position of last mouse down
-  }
-  updateIs3DView(newValue) {
-    this.is3DView = newValue
   }
 
   onMouseDown(event) {
@@ -70,21 +56,23 @@ class MouseClickActivity {
     this.lastMouseDownPosition = null
 
     this.mousePoints.length = 0
-    console.log(this.linesArray)
+    console.log(wallEditor.linesArray)
   }
 
   addPoint(event) {
-    if (!this.is3DView) {
+    if (!wallEditor.is3DView) {
       const mouse = new THREE.Vector2(
         (event.clientX / window.innerWidth) * 2 - 1,
         -(event.clientY / window.innerHeight) * 2 + 1
       )
       const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(mouse, this.camera)
+      raycaster.setFromCamera(mouse, wallEditor.camera)
       const intersection = new THREE.Vector3()
       raycaster.ray.intersectPlane(
         new THREE.Plane(
-          new THREE.Vector3(0, 0, 1).applyMatrix4(this.camera.matrixWorld),
+          new THREE.Vector3(0, 0, 1).applyMatrix4(
+            wallEditor.camera.matrixWorld
+          ),
           0
         ),
         intersection
@@ -103,42 +91,37 @@ class MouseClickActivity {
 
       this.mousePoints.push(intersection)
 
-      if (this.mousePoints.length >= 2 && !this.is3DView) {
+      if (this.mousePoints.length >= 2 && !wallEditor.is3DView) {
         // this.clearTemporaryPoint()
         this.addLineData(
           this.mousePoints[this.mousePoints.length - 2],
           this.mousePoints[this.mousePoints.length - 1],
-          this.currentWidth,
-          this.currentAlignment
+          wallEditor.currentWidth,
+          this.currentAlignment,
+          wallEditor.color
         )
-        this.clearScene(this.scene)
+        this.clearScene(wallEditor.scene)
 
-        // this.linesArray.forEach((line) => this.wallDrawer.drawWalls(line))
-
-        //temp check
-        for (let i = 0; i < this.linesArray.length; i++) {
-          const line = this.linesArray[i]
-          const nextLine = this.linesArray[i + 1]
-
-          this.wallDrawer.drawWalls(line, nextLine)
-        }
-
-        //temp check
+        wallEditor.linesArray.forEach((line) =>
+          this.wallDrawer.draw2DWall(line)
+        )
       }
     }
   }
   handleTemporaryLine(event) {
-    if (!this.is3DView && MouseClickActivity.isMouseDownVar) {
+    if (!wallEditor.is3DView && MouseClickActivity.isMouseDownVar) {
       const mouse = new THREE.Vector2(
         (event.clientX / window.innerWidth) * 2 - 1,
         -(event.clientY / window.innerHeight) * 2 + 1
       )
       const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(mouse, this.camera)
+      raycaster.setFromCamera(mouse, wallEditor.camera)
       const intersection = new THREE.Vector3()
       raycaster.ray.intersectPlane(
         new THREE.Plane(
-          new THREE.Vector3(0, 0, 1).applyMatrix4(this.camera.matrixWorld),
+          new THREE.Vector3(0, 0, 1).applyMatrix4(
+            wallEditor.camera.matrixWorld
+          ),
           0
         ),
         intersection
@@ -156,18 +139,9 @@ class MouseClickActivity {
     }
   }
 
-  //   createTemporaryLine(start, end) {
-  //     const geometry = new THREE.BufferGeometry().setFromPoints([start, end])
-  //     const lineMaterial = new THREE.LineBasicMaterial({
-  //       color: 'grey',
-  //     })
-  //     this.temporaryLine = new THREE.LineSegments(geometry, lineMaterial)
-  //     this.scene.add(this.temporaryLine)
-  //   }
-
   clearTemporaryLine() {
     if (this.temporaryLine) {
-      this.scene.remove(this.temporaryLine)
+      wallEditor.scene.remove(this.temporaryLine)
       this.temporaryLine.geometry.dispose()
       this.temporaryLine.material.dispose()
       this.temporaryLine = null
@@ -177,33 +151,8 @@ class MouseClickActivity {
     const direction = new THREE.Vector3().copy(end).sub(start).normalize()
 
     const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
-    const wallWidth = 0.025 * this.currentWidth
-    // const direction = new THREE.Vector3().copy(end).sub(start).normalize()
-
-    // const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
-    // const wallWidth = 0.025 * this.currentWidth
-    // const p1 = new THREE.Vector3()
-    //   .copy(start)
-    //   .addScaledVector(perpendicular, wallWidth / 2)
-    // const p2 = new THREE.Vector3()
-    //   .copy(end)
-    //   .addScaledVector(perpendicular, wallWidth / 2)
-    // const p3 = new THREE.Vector3()
-    //   .copy(end)
-    //   .addScaledVector(perpendicular, -wallWidth / 2)
-    // const p4 = new THREE.Vector3()
-    //   .copy(start)
-    //   .addScaledVector(perpendicular, -wallWidth / 2)
-
-    // const shape = new THREE.Shape([p1, p2, p3, p4])
-
-    // const extrudeSettings = {
-    //   depth: 0.5,
-    //   bevelEnabled: false,
-    // }
-    // const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    // this.temporaryLine = new THREE.Mesh(geometry, this.material)
-    // this.scene.add(this.temporaryLine)
+    const wallWidth = 0.025 * wallEditor.currentWidth
+    wallEditor.material.color.set(wallEditor.color)
 
     if (this.currentAlignment === 'Top') {
       const p1 = new THREE.Vector3()
@@ -216,11 +165,7 @@ class MouseClickActivity {
       // .addScaledVector(perpendicular, -wallWidth / 2)
       const p4 = new THREE.Vector3().copy(start)
       // .addScaledVector(perpendicular, -wallWidth / 2)
-      const shape = new THREE.Shape([p1, p2, p3, p4])
-      const extrudeSettings = { depth: 0.5, bevelEnabled: false }
-      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-      this.temporaryLine = new THREE.Mesh(geometry, this.material)
-      this.scene.add(this.temporaryLine)
+      this.createSolidFill(p1, p2, p3, p4)
     } else if (this.currentAlignment === 'Bottom') {
       const p1 = new THREE.Vector3().copy(start)
       // .addScaledVector(perpendicular, wallWidth / 2)
@@ -232,13 +177,7 @@ class MouseClickActivity {
       const p4 = new THREE.Vector3()
         .copy(start)
         .addScaledVector(perpendicular, wallWidth)
-
-      const shape = new THREE.Shape([p1, p2, p3, p4])
-
-      const extrudeSettings = { depth: 0.5, bevelEnabled: false }
-      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-      this.temporaryLine = new THREE.Mesh(geometry, this.material)
-      this.scene.add(this.temporaryLine)
+      this.createSolidFill(p1, p2, p3, p4)
     } else if (this.currentAlignment === 'Center') {
       const p1 = new THREE.Vector3()
         .copy(start)
@@ -252,21 +191,63 @@ class MouseClickActivity {
       const p4 = new THREE.Vector3()
         .copy(start)
         .addScaledVector(perpendicular, -wallWidth / 2)
-
-      const shape = new THREE.Shape([p1, p2, p3, p4])
-
-      const extrudeSettings = {
-        depth: 0.5,
-        bevelEnabled: false,
-      }
-      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-      this.temporaryLine = new THREE.Mesh(geometry, this.material)
-      this.scene.add(this.temporaryLine)
+      this.createSolidFill(p1, p2, p3, p4)
     }
   }
+  createSolidFill(p1, p2, p3, p4) {
+    // Define vertices for the wall outline, top, and sides
+    const vertices = [
+      p1.x,
+      p1.y,
+      0, // Vertex 0
+      p2.x,
+      p2.y,
+      0, // Vertex 1
+      p3.x,
+      p3.y,
+      0, // Vertex 2
+      p4.x,
+      p4.y,
+      0, // Vertex 3
 
+      p1.x,
+      p1.y,
+      0.5, // Vertex 4
+      p2.x,
+      p2.y,
+      0.5, // Vertex 5
+      p3.x,
+      p3.y,
+      0.5, // Vertex 6
+      p4.x,
+      p4.y,
+      0.5, // Vertex 7
+    ]
+
+    // Define indices for the wall
+    const indices = [
+      // Top face
+      4, 5, 6, 4, 6, 7,
+      // Bottom face
+      0, 1, 2, 0, 2, 3,
+      // Side faces
+      0, 4, 1, 4, 5, 1, 1, 5, 2, 5, 6, 2, 2, 6, 3, 6, 7, 3, 3, 7, 0, 7, 4, 0,
+    ]
+
+    // Create buffer geometry
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(vertices, 3)
+    )
+    geometry.setIndex(indices)
+
+    // Create a Mesh
+    this.temporaryLine = new THREE.Mesh(geometry, wallEditor.material)
+    wallEditor.scene.add(this.temporaryLine)
+  }
   addEventListeners() {
-    if (!this.is3DView) {
+    if (!wallEditor.is3DView) {
       document.addEventListener('mousemove', (event) =>
         this.handleTemporaryLine(event)
       )
@@ -274,19 +255,15 @@ class MouseClickActivity {
       document.addEventListener('mouseup', this.onMouseUp.bind(this))
     }
     document.getElementById('threeDToggleBtn').addEventListener('click', () => {
-      switchTo3DView()
+      this.switchTo3DView()
     })
-
-    document
-      .getElementById('threeDOutlineBtn')
-      .addEventListener('click', () => this.switchTo3DOutline())
 
     document
       .getElementById('correctedWallTaskBtn')
       .addEventListener('click', () => {
-        if (this.is3DView) {
-          this.clearScene(this.scene)
-          this.linesArray.forEach((line) =>
+        if (wallEditor.is3DView) {
+          this.clearScene(wallEditor.scene)
+          wallEditor.linesArray.forEach((line) =>
             this.wallDrawer.correctedWallIn3DView(line)
           )
         }
@@ -295,13 +272,13 @@ class MouseClickActivity {
     document
       .getElementById('wallWidthRange')
       .addEventListener('input', (event) => {
-        this.currentWidth = parseFloat(event.target.value)
+        wallEditor.currentWidth = parseFloat(event.target.value)
       })
 
     document.getElementById('clearAllBtn').addEventListener('click', () => {
-      if (!this.is3DView) {
-        this.linesArray.length = 0
-        this.clearScene(this.scene)
+      if (!wallEditor.is3DView) {
+        wallEditor.linesArray.length = 0
+        this.clearScene(wallEditor.scene)
       }
     })
 
@@ -314,6 +291,72 @@ class MouseClickActivity {
           console.log('Selected alignment:', selectedAlignment)
         })
       })
+    document
+      .querySelectorAll('input[name="wallPatternRadioBtn"]')
+      .forEach((radioBtn) => {
+        radioBtn.addEventListener('change', (e) => {
+          wallEditor.currentWallPattern = e.target.value
+          this.clearScene(wallEditor.scene)
+          wallEditor.linesArray.forEach((line) =>
+            this.wallDrawer.draw2DWall(line)
+          )
+        })
+      })
+    document
+      .querySelectorAll('input[name="colorRadioBtn"]')
+      .forEach((radioBtn) => {
+        radioBtn.addEventListener('change', (e) => {
+          wallEditor.color = e.target.value
+          console.log('Selected color:', wallEditor.color)
+        })
+      })
+
+    document
+      .getElementById('spaceBetweenLinesRange')
+      .addEventListener('input', (event) => {
+        wallEditor.spaceBetweenLines = parseInt(event.target.value)
+        console.log(wallEditor.spaceBetweenLines)
+      })
+  }
+  switchTo3DView() {
+    this.clearScene(wallEditor.scene)
+
+    if (wallEditor.is3DView) {
+      wallEditor.camera = new THREE.OrthographicCamera(
+        -wallEditor.aspect,
+        wallEditor.aspect,
+        1,
+        -1,
+        0.1,
+        1000
+      )
+
+      wallEditor.camera.position.z = 5
+      wallEditor.controls.enableRotate = false // Disable rotation
+      wallEditor.linesArray.forEach((line) => this.wallDrawer.draw2DWall(line))
+      this.toggleBtns2D()
+    } else {
+      if (wallEditor.linesArray.length === 0) {
+        alert('Draw something to see in 3D View')
+        return
+      }
+      wallEditor.camera = new THREE.PerspectiveCamera(
+        45,
+        wallEditor.aspect,
+        0.1,
+        1000
+      )
+      wallEditor.camera.position.z = 3
+      wallEditor.controls = new OrbitControls(
+        wallEditor.camera,
+        wallEditor.renderer.domElement
+      )
+      wallEditor.controls.enableRotate = true // Enable rotation
+      wallEditor.linesArray.forEach((line) => this.wallDrawer.draw3DWall(line))
+      this.toggleBtns3D()
+    }
+
+    wallEditor.is3DView = !wallEditor.is3DView
   }
 }
 
