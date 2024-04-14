@@ -9,6 +9,10 @@ class WallDrawer extends THREE.Object3D {
     this.add(this.wallEdge3DMesh)
   }
 
+  drawCurrentWall(){
+
+  }
+
   draw2DWall(line) {
     const direction = new THREE.Vector3()
       .copy(line.end)

@@ -12,8 +12,6 @@ class MouseClickActivity {
     addLineData,
     clearScene,
     wallDrawer,
-    toggleBtns2D,
-    toggleBtns3D
   ) {
     this.mousePoints = mousePoints
     this.currentAlignment = currentAlignment
@@ -21,12 +19,30 @@ class MouseClickActivity {
     this.clearScene = clearScene
     this.wallDrawer = wallDrawer
 
-    this.toggleBtns2D = toggleBtns2D
-    this.toggleBtns3D = toggleBtns3D
-
     // Declare temporaryLine as a class property and initialize it as null
     this.temporaryLine = null
     this.lastMouseDownPosition = null // Store the position of last mouse down
+  }
+
+  toggleBtns3D() {
+    document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View'
+    document.getElementById('correctedWallTaskBtn').style.display = 'block'
+    document.getElementById('wallWidth').style.display = 'none'
+    document.getElementById('clearAllBtn').style.display = 'none'
+    document.getElementById('alignments').style.display = 'none'
+    document.getElementById('wallPatterns').style.display = 'none'
+    document.getElementById('colors').style.display = 'none'
+    document.getElementById('spaceBetweenLines').style.display = 'none'
+  }
+  toggleBtns2D() {
+    document.getElementById('threeDToggleBtn').textContent = 'Change to 3D View'
+    document.getElementById('correctedWallTaskBtn').style.display = 'none'
+    document.getElementById('wallWidth').style.display = 'block'
+    document.getElementById('clearAllBtn').style.display = 'block'
+    document.getElementById('alignments').style.display = 'block'
+    document.getElementById('wallPatterns').style.display = 'block'
+    document.getElementById('colors').style.display = 'block'
+    document.getElementById('spaceBetweenLines').style.display = 'block'
   }
 
   onMouseDown(event) {
@@ -100,6 +116,8 @@ class MouseClickActivity {
           this.currentAlignment,
           wallEditor.color
         )
+        console.log(wallEditor.linesArray[wallEditor.linesArray.length-1])
+        
         this.clearScene(wallEditor.scene)
 
         wallEditor.linesArray.forEach((line) =>

@@ -18,9 +18,8 @@ window.wallEditor = {
 }
 
 const scene = new THREE.Scene()
-wallEditor.scene = scene
 const aspect = window.innerWidth / window.innerHeight
-wallEditor.aspect = aspect
+wallEditor.aspect = aspect //wallEditor
 let camera = new THREE.OrthographicCamera(
   -wallEditor.aspect,
   wallEditor.aspect,
@@ -28,20 +27,17 @@ let camera = new THREE.OrthographicCamera(
   -1,
   0.1,
   1000
-)
+  )
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById('canvas'),
   antialias: true,
 })
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setClearColor('white')
-wallEditor.renderer = renderer
 
 camera.position.z = 5
-let controls = null
 
-wallEditor.controls = controls
-wallEditor.camera = camera
+let controls = null
 
 const material = new THREE.MeshBasicMaterial({
   color: 'red',
@@ -49,7 +45,7 @@ const material = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide,
 })
 
-wallEditor.material = material
+
 
 const mousePoints = []
 const linesArray = []
@@ -58,13 +54,18 @@ let is3DView = false
 let currentWidth = parseFloat(document.getElementById('wallWidthRange').value)
 let currentAlignment = 'Center'
 let currentWallPattern = 'solidFill'
-wallEditor.currentWallPattern = currentWallPattern
 let color = 'red'
 
+wallEditor.currentWallPattern = currentWallPattern
 wallEditor.color = color
 wallEditor.is3DView = is3DView
 wallEditor.linesArray = linesArray
 wallEditor.currentWidth = currentWidth
+wallEditor.material = material
+wallEditor.renderer = renderer
+wallEditor.scene = scene
+wallEditor.controls = controls
+wallEditor.camera = camera
 
 const wallDrawer = new WallDrawer()
 const staticComponents = new StaticComponents()
@@ -73,11 +74,9 @@ const mouseClickActivity = new MouseClickActivity(
   currentAlignment,
   staticComponents.addLineData,
   staticComponents.clearScene,
-  wallDrawer,
-  staticComponents.toggleBtns2D,
-  staticComponents.toggleBtns3D
+  wallDrawer
 )
 
-mouseClickActivity.addEventListeners()
 
+mouseClickActivity.addEventListeners()
 staticComponents.animate()
