@@ -27,7 +27,7 @@ let camera = new THREE.OrthographicCamera(
   -1,
   0.1,
   1000
-  )
+)
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById('canvas'),
   antialias: true,
@@ -36,6 +36,7 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setClearColor('white')
 
 camera.position.z = 5
+wallEditor.spaceBetweenLines = 1
 
 let controls = null
 
@@ -45,8 +46,6 @@ const material = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide,
 })
 
-
-
 const mousePoints = []
 const linesArray = []
 let isMouseDown = false
@@ -55,6 +54,9 @@ let currentWidth = parseFloat(document.getElementById('wallWidthRange').value)
 let currentAlignment = 'Center'
 let currentWallPattern = 'solidFill'
 let color = 'red'
+wallEditor.isLineConnected = false
+wallEditor.previousEndPoints = []
+wallEditor.wallLines = []
 
 wallEditor.currentWallPattern = currentWallPattern
 wallEditor.color = color
@@ -76,7 +78,6 @@ const mouseClickActivity = new MouseClickActivity(
   staticComponents.clearScene,
   wallDrawer
 )
-
 
 mouseClickActivity.addEventListeners()
 staticComponents.animate()

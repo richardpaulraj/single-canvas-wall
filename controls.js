@@ -11,7 +11,7 @@ class MouseClickActivity {
     currentAlignment, //This can't be general for all
     addLineData,
     clearScene,
-    wallDrawer,
+    wallDrawer
   ) {
     this.mousePoints = mousePoints
     this.currentAlignment = currentAlignment
@@ -47,6 +47,7 @@ class MouseClickActivity {
 
   onMouseDown(event) {
     MouseClickActivity.isMouseDownVar = true
+    this.clearTemporaryLine()
     // this.addPoint(event)
     this.handleTemporaryLine(event)
     // Store the position of mouse down
@@ -116,10 +117,14 @@ class MouseClickActivity {
           this.currentAlignment,
           wallEditor.color
         )
-        console.log(wallEditor.linesArray[wallEditor.linesArray.length-1])
-        
-        this.clearScene(wallEditor.scene)
+        console.log(wallEditor.linesArray[wallEditor.linesArray.length - 1])
+        const latestLine =
+          wallEditor.linesArray[wallEditor.linesArray.length - 1]
 
+        //without using forEach method
+        // this.wallDrawer.draw2DWall(latestLine)
+
+        this.clearScene(wallEditor.scene)
         wallEditor.linesArray.forEach((line) =>
           this.wallDrawer.draw2DWall(line)
         )
