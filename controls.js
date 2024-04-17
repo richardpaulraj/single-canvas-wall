@@ -1,28 +1,15 @@
-// controls.js
-
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import WallDrawer from './wallDrawer.js'
+import StaticComponents from './staticComponents.js'
+import TemporaryLine from './tempLine.js'
+
+const wallDrawer = new WallDrawer()
+const staticComponents = new StaticComponents()
+const temporaryLine = new TemporaryLine()
 
 class MouseClickActivity {
-  static isMouseDownVar = false
 
-  constructor(
-    mousePoints,
-    currentAlignment, //This can't be general for all
-    addLineData,
-    clearScene,
-    wallDrawer
-  ) {
-    this.mousePoints = mousePoints
-    this.currentAlignment = currentAlignment
-    this.addLineData = addLineData
-    this.clearScene = clearScene
-    this.wallDrawer = wallDrawer
-
-    // Declare temporaryLine as a class property and initialize it as null
-    this.temporaryLine = null
-    this.lastMouseDownPosition = null // Store the position of last mouse down
-  }
+  constructor() {}
 
   toggleBtns3D() {
     document.getElementById('threeDToggleBtn').textContent = 'Change to 2D View'
@@ -46,233 +33,77 @@ class MouseClickActivity {
   }
 
   onMouseDown(event) {
-    MouseClickActivity.isMouseDownVar = true
-    this.clearTemporaryLine()
-    // this.addPoint(event)
-    this.handleTemporaryLine(event)
-    // Store the position of mouse down
-    this.lastMouseDownPosition = { x: event.clientX, y: event.clientY }
+    wallEditor.isMouseDown = true
+    temporaryLine.clearTemporaryLine()
+    temporaryLine.handleTemporaryLine(event)
+    wallEditor.lastMouseDownPosition = { x: event.clientX, y: event.clientY }
   }
 
   onMouseUp(event) {
-    MouseClickActivity.isMouseDownVar = false
-    this.clearTemporaryLine()
+    wallEditor.isMouseDown = false
+    temporaryLine.clearTemporaryLine()
 
     // Check if the mouse has moved between mousedown and mouseup
     if (
-      this.lastMouseDownPosition &&
-      (this.lastMouseDownPosition.x !== event.clientX ||
-        this.lastMouseDownPosition.y !== event.clientY)
+      !wallEditor.is3DView && wallEditor.lastMouseDownPosition && 
+      (wallEditor.lastMouseDownPosition.x !== event.clientX ||
+        wallEditor.lastMouseDownPosition.y !== event.clientY)
     ) {
       // Call addPoint only if the mouse has moved
       this.addPoint(event)
-      this.mousePoints.length = 0
+      wallEditor.mousePoints.length = 0
     }
 
     // Reset the last mouse down position
-    this.lastMouseDownPosition = null
+    wallEditor.lastMouseDownPosition = null
 
-    this.mousePoints.length = 0
-    console.log(wallEditor.linesArray)
+    wallEditor.mousePoints.length = 0
   }
 
   addPoint(event) {
-    if (!wallEditor.is3DView) {
-      const mouse = new THREE.Vector2(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
-      )
-      const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(mouse, wallEditor.camera)
-      const intersection = new THREE.Vector3()
-      raycaster.ray.intersectPlane(
-        new THREE.Plane(
-          new THREE.Vector3(0, 0, 1).applyMatrix4(
-            wallEditor.camera.matrixWorld
-          ),
-          0
-        ),
-        intersection
-      )
 
-      if (this.mousePoints.length === 0) {
-        //   this.createTemporaryPoint(intersection)
-        this.mousePoints.push(intersection)
-      } else {
-        this.clearTemporaryLine()
-        this.createTemporaryLine(
-          this.mousePoints[this.mousePoints.length - 1],
-          intersection
-        )
-      }
-
-      this.mousePoints.push(intersection)
-
-      if (this.mousePoints.length >= 2 && !wallEditor.is3DView) {
-        // this.clearTemporaryPoint()
-        this.addLineData(
-          this.mousePoints[this.mousePoints.length - 2],
-          this.mousePoints[this.mousePoints.length - 1],
-          wallEditor.currentWidth,
-          this.currentAlignment,
-          wallEditor.color
-        )
-        console.log(wallEditor.linesArray[wallEditor.linesArray.length - 1])
-        const latestLine =
-          wallEditor.linesArray[wallEditor.linesArray.length - 1]
-
-        //without using forEach method
-        // this.wallDrawer.draw2DWall(latestLine)
-
-        this.clearScene(wallEditor.scene)
-        wallEditor.linesArray.forEach((line) =>
-          this.wallDrawer.draw2DWall(line)
-        )
-      }
-    }
-  }
-  handleTemporaryLine(event) {
-    if (!wallEditor.is3DView && MouseClickActivity.isMouseDownVar) {
-      const mouse = new THREE.Vector2(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
-      )
-      const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(mouse, wallEditor.camera)
-      const intersection = new THREE.Vector3()
-      raycaster.ray.intersectPlane(
-        new THREE.Plane(
-          new THREE.Vector3(0, 0, 1).applyMatrix4(
-            wallEditor.camera.matrixWorld
-          ),
-          0
-        ),
-        intersection
-      )
-
-      if (this.mousePoints.length === 0) {
-        this.mousePoints.push(intersection)
-      } else {
-        this.clearTemporaryLine()
-        this.createTemporaryLine(
-          this.mousePoints[this.mousePoints.length - 1],
-          intersection
-        )
-      }
-    }
-  }
-
-  clearTemporaryLine() {
-    if (this.temporaryLine) {
-      wallEditor.scene.remove(this.temporaryLine)
-      this.temporaryLine.geometry.dispose()
-      this.temporaryLine.material.dispose()
-      this.temporaryLine = null
-    }
-  }
-  createTemporaryLine(start, end) {
-    const direction = new THREE.Vector3().copy(end).sub(start).normalize()
-
-    const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
-    const wallWidth = 0.025 * wallEditor.currentWidth
-    wallEditor.material.color.set(wallEditor.color)
-
-    if (this.currentAlignment === 'Top') {
-      const p1 = new THREE.Vector3()
-        .copy(start)
-        .addScaledVector(perpendicular, -wallWidth)
-      const p2 = new THREE.Vector3()
-        .copy(end)
-        .addScaledVector(perpendicular, -wallWidth)
-      const p3 = new THREE.Vector3().copy(end)
-      // .addScaledVector(perpendicular, -wallWidth / 2)
-      const p4 = new THREE.Vector3().copy(start)
-      // .addScaledVector(perpendicular, -wallWidth / 2)
-      this.createSolidFill(p1, p2, p3, p4)
-    } else if (this.currentAlignment === 'Bottom') {
-      const p1 = new THREE.Vector3().copy(start)
-      // .addScaledVector(perpendicular, wallWidth / 2)
-      const p2 = new THREE.Vector3().copy(end)
-      // .addScaledVector(perpendicular, wallWidth / 2)
-      const p3 = new THREE.Vector3()
-        .copy(end)
-        .addScaledVector(perpendicular, wallWidth)
-      const p4 = new THREE.Vector3()
-        .copy(start)
-        .addScaledVector(perpendicular, wallWidth)
-      this.createSolidFill(p1, p2, p3, p4)
-    } else if (this.currentAlignment === 'Center') {
-      const p1 = new THREE.Vector3()
-        .copy(start)
-        .addScaledVector(perpendicular, wallWidth / 2)
-      const p2 = new THREE.Vector3()
-        .copy(end)
-        .addScaledVector(perpendicular, wallWidth / 2)
-      const p3 = new THREE.Vector3()
-        .copy(end)
-        .addScaledVector(perpendicular, -wallWidth / 2)
-      const p4 = new THREE.Vector3()
-        .copy(start)
-        .addScaledVector(perpendicular, -wallWidth / 2)
-      this.createSolidFill(p1, p2, p3, p4)
-    }
-  }
-  createSolidFill(p1, p2, p3, p4) {
-    // Define vertices for the wall outline, top, and sides
-    const vertices = [
-      p1.x,
-      p1.y,
-      0, // Vertex 0
-      p2.x,
-      p2.y,
-      0, // Vertex 1
-      p3.x,
-      p3.y,
-      0, // Vertex 2
-      p4.x,
-      p4.y,
-      0, // Vertex 3
-
-      p1.x,
-      p1.y,
-      0.5, // Vertex 4
-      p2.x,
-      p2.y,
-      0.5, // Vertex 5
-      p3.x,
-      p3.y,
-      0.5, // Vertex 6
-      p4.x,
-      p4.y,
-      0.5, // Vertex 7
-    ]
-
-    // Define indices for the wall
-    const indices = [
-      // Top face
-      4, 5, 6, 4, 6, 7,
-      // Bottom face
-      0, 1, 2, 0, 2, 3,
-      // Side faces
-      0, 4, 1, 4, 5, 1, 1, 5, 2, 5, 6, 2, 2, 6, 3, 6, 7, 3, 3, 7, 0, 7, 4, 0,
-    ]
-
-    // Create buffer geometry
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(vertices, 3)
+    const mouse = new THREE.Vector2(
+      (event.clientX / window.innerWidth) * 2 - 1,
+      -(event.clientY / window.innerHeight) * 2 + 1
     )
-    geometry.setIndex(indices)
+    const raycaster = new THREE.Raycaster()
+    raycaster.setFromCamera(mouse, wallEditor.camera)
+    const intersection = new THREE.Vector3()
+    raycaster.ray.intersectPlane(
+      new THREE.Plane(
+        new THREE.Vector3(0, 0, 1).applyMatrix4(
+          wallEditor.camera.matrixWorld
+        ),
+        0
+      ),
+      intersection
+    )
 
-    // Create a Mesh
-    this.temporaryLine = new THREE.Mesh(geometry, wallEditor.material)
-    wallEditor.scene.add(this.temporaryLine)
-  }
+    if (wallEditor.mousePoints.length === 0) {
+      //   this.createTemporaryPoint(intersection)
+      wallEditor.mousePoints.push(intersection)
+    } else {
+      temporaryLine.clearTemporaryLine()
+      temporaryLine.createTemporaryLine(
+        wallEditor.mousePoints[wallEditor.mousePoints.length - 1],
+        intersection
+      )
+      }
+
+    wallEditor.mousePoints.push(intersection)
+
+    if (wallEditor.mousePoints.length >= 2 && !wallEditor.is3DView) {
+      staticComponents.addLineData()
+      const latestLine = wallEditor.linesArray[wallEditor.linesArray.length - 1]
+
+      wallDrawer.draw2DWall(latestLine)
+    }
+    }
+  
   addEventListeners() {
     if (!wallEditor.is3DView) {
       document.addEventListener('mousemove', (event) =>
-        this.handleTemporaryLine(event)
+        temporaryLine.handleTemporaryLine(event)
       )
       document.addEventListener('mousedown', this.onMouseDown.bind(this))
       document.addEventListener('mouseup', this.onMouseUp.bind(this))
@@ -285,9 +116,10 @@ class MouseClickActivity {
       .getElementById('correctedWallTaskBtn')
       .addEventListener('click', () => {
         if (wallEditor.is3DView) {
-          this.clearScene(wallEditor.scene)
+          staticComponents.clearScene(wallEditor.scene)
           wallEditor.linesArray.forEach((line) =>
-            this.wallDrawer.correctedWallIn3DView(line)
+            //wallDrawer.correctedWallIn3DView(line)
+            wallDrawer.correctedWallIn3DView(line)
           )
         }
       })
@@ -301,7 +133,7 @@ class MouseClickActivity {
     document.getElementById('clearAllBtn').addEventListener('click', () => {
       if (!wallEditor.is3DView) {
         wallEditor.linesArray.length = 0
-        this.clearScene(wallEditor.scene)
+        staticComponents.clearScene(wallEditor.scene)
       }
     })
 
@@ -309,9 +141,8 @@ class MouseClickActivity {
       .querySelectorAll('input[name="alignmentsRadioBtn"]')
       .forEach((radioBtn) => {
         radioBtn.addEventListener('change', (e) => {
-          const selectedAlignment = e.target.value
-          this.currentAlignment = selectedAlignment
-          console.log('Selected alignment:', selectedAlignment)
+          wallEditor.currentAlignment = e.target.value
+          console.log('Selected alignment:', wallEditor.currentAlignment)
         })
       })
     document
@@ -319,10 +150,6 @@ class MouseClickActivity {
       .forEach((radioBtn) => {
         radioBtn.addEventListener('change', (e) => {
           wallEditor.currentWallPattern = e.target.value
-          this.clearScene(wallEditor.scene)
-          wallEditor.linesArray.forEach((line) =>
-            this.wallDrawer.draw2DWall(line)
-          )
         })
       })
     document
@@ -342,40 +169,23 @@ class MouseClickActivity {
       })
   }
   switchTo3DView() {
-    this.clearScene(wallEditor.scene)
-
+    
     if (wallEditor.is3DView) {
-      wallEditor.camera = new THREE.OrthographicCamera(
-        -wallEditor.aspect,
-        wallEditor.aspect,
-        1,
-        -1,
-        0.1,
-        1000
-      )
-
-      wallEditor.camera.position.z = 5
-      wallEditor.controls.enableRotate = false // Disable rotation
-      wallEditor.linesArray.forEach((line) => this.wallDrawer.draw2DWall(line))
+      wallEditor.camera = wallEditor.orthographicCamera
+      wallEditor.controls.object = wallEditor.camera;
+      wallEditor.controls.enableRotate = false 
+      wallEditor.linesArray.forEach((line) => wallDrawer.draw2DWall(line))
       this.toggleBtns2D()
     } else {
       if (wallEditor.linesArray.length === 0) {
         alert('Draw something to see in 3D View')
         return
       }
-      wallEditor.camera = new THREE.PerspectiveCamera(
-        45,
-        wallEditor.aspect,
-        0.1,
-        1000
-      )
-      wallEditor.camera.position.z = 3
-      wallEditor.controls = new OrbitControls(
-        wallEditor.camera,
-        wallEditor.renderer.domElement
-      )
-      wallEditor.controls.enableRotate = true // Enable rotation
-      wallEditor.linesArray.forEach((line) => this.wallDrawer.draw3DWall(line))
+      wallEditor.camera = wallEditor.perspectiveCamera
+      wallEditor.controls.object = wallEditor.camera;
+      wallEditor.controls.enableRotate = true 
+
+      wallEditor.linesArray.forEach((line) => wallDrawer.draw3DWall(line))
       this.toggleBtns3D()
     }
 

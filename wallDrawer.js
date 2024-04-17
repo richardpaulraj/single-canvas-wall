@@ -4,12 +4,13 @@ class WallDrawer extends THREE.Object3D {
   constructor() {
     super()
     this.wallEdge3DMesh = new THREE.Mesh(new THREE.BufferGeometry())
-
-    // Add the wall to the scene
     this.add(this.wallEdge3DMesh)
   }
 
   draw2DWall(line) {
+
+
+    console.log(line)
     const direction = new THREE.Vector3()
       .copy(line.end)
       .sub(line.start)
@@ -29,29 +30,26 @@ class WallDrawer extends THREE.Object3D {
       // .addScaledVector(perpendicular, -wallWidth / 2)
       const p4 = new THREE.Vector3().copy(line.start)
       // .addScaledVector(perpendicular, -wallWidth / 2)
-      if (wallEditor.currentWallPattern === 'solidFill') {
+      if (line.wallPattern === 'solidFill') {
         this.createSolidFill(p1, p2, p3, p4, line.color)
-      } else if (wallEditor.currentWallPattern === 'whiteFill') {
+      } else if (line.wallPattern  === 'whiteFill') {
         this.createWhiteFill(p1, p2, p3, p4, line.color)
-      } else if (wallEditor.currentWallPattern === 'crissCross') {
+      } else if (line.wallPattern  === 'crissCross') {
         this.createCrissCross(
           p1,
           p2,
           p3,
           p4,
-          line.color,
-          line.width,
-          line.alignment
+          line
         )
-      } else if (wallEditor.currentWallPattern === 'lines') {
+      } else if (line.wallPattern  === 'lines') {
         this.createLinesPattern(
           p1,
           p2,
           p3,
           p4,
-          line.color,
-          line.width,
-          line.alignment
+
+          line
         )
       }
     } else if (line.alignment === 'Bottom') {
@@ -66,29 +64,25 @@ class WallDrawer extends THREE.Object3D {
         .copy(line.start)
         .addScaledVector(perpendicular, wallWidth)
 
-      if (wallEditor.currentWallPattern === 'solidFill') {
+      if (line.wallPattern  === 'solidFill') {
         this.createSolidFill(p1, p2, p3, p4, line.color)
-      } else if (wallEditor.currentWallPattern === 'whiteFill') {
+      } else if (line.wallPattern  === 'whiteFill') {
         this.createWhiteFill(p1, p2, p3, p4, line.color)
-      } else if (wallEditor.currentWallPattern === 'crissCross') {
+      } else if (line.wallPattern  === 'crissCross') {
         this.createCrissCross(
           p1,
           p2,
           p3,
           p4,
-          line.color,
-          line.width,
-          line.alignment
+          line
         )
-      } else if (wallEditor.currentWallPattern === 'lines') {
+      } else if (line.wallPattern  === 'lines') {
         this.createLinesPattern(
           p1,
           p2,
           p3,
           p4,
-          line.color,
-          line.width,
-          line.alignment
+          line
         )
       }
     } else if (line.alignment === 'Center') {
@@ -104,29 +98,25 @@ class WallDrawer extends THREE.Object3D {
       const p4 = new THREE.Vector3()
         .copy(line.start)
         .addScaledVector(perpendicular, -wallWidth / 2)
-      if (wallEditor.currentWallPattern === 'solidFill') {
+      if (line.wallPattern  === 'solidFill') {
         this.createSolidFill(p1, p2, p3, p4, line.color, line.width)
-      } else if (wallEditor.currentWallPattern === 'whiteFill') {
+      } else if (line.wallPattern  === 'whiteFill') {
         this.createWhiteFill(p1, p2, p3, p4, line.color)
-      } else if (wallEditor.currentWallPattern === 'crissCross') {
+      } else if (line.wallPattern  === 'crissCross') {
         this.createCrissCross(
           p1,
           p2,
           p3,
           p4,
-          line.color,
-          line.width,
-          line.alignment
+          line
         )
-      } else if (wallEditor.currentWallPattern === 'lines') {
+      } else if (line.wallPattern  === 'lines') {
         this.createLinesPattern(
           p1,
           p2,
           p3,
           p4,
-          line.color,
-          line.width,
-          line.alignment
+          line
         )
       }
     }
@@ -242,122 +232,6 @@ class WallDrawer extends THREE.Object3D {
     wallEditor.scene.add(wall)
   }
 
-  // createSolidFillPreviousLine(previousLine) {
-  //   const direction = new THREE.Vector3()
-  //     .copy(previousLine.end)
-  //     .sub(previousLine.start)
-  //     .normalize()
-  //   const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
-  //   const wallWidth = 0.025 * previousLine.width
-
-  //   let p1 = new THREE.Vector3()
-  //     .copy(previousLine.start)
-  //     .addScaledVector(perpendicular, wallWidth / 2)
-  //   let p2 = new THREE.Vector3()
-  //     .copy(previousLine.end)
-  //     .addScaledVector(perpendicular, wallWidth / 2)
-  //   let p3 = new THREE.Vector3()
-  //     .copy(previousLine.end)
-  //     .addScaledVector(perpendicular, -wallWidth / 2)
-  //   let p4 = new THREE.Vector3()
-  //     .copy(previousLine.start)
-  //     .addScaledVector(perpendicular, -wallWidth / 2)
-
-  //   if (Math.abs(previousLine.start.y - previousLine.end.y) < 0.1) {
-  //     // if horizontal
-  //     p2.add(new THREE.Vector3(wallWidth / 2, 0, 0))
-  //     p3.sub(new THREE.Vector3(wallWidth / 2, 0, 0))
-  //   } else if (Math.abs(previousLine.start.x - previousLine.end.x) < 0.05) {
-  //     // If vertical
-  //     p1.add(new THREE.Vector3(0, wallWidth / 2, 0))
-  //     p4.sub(new THREE.Vector3(0, wallWidth / 2, 0))
-  //   }
-
-  //   const shape = new THREE.Shape([p1, p2, p3, p4])
-  //   const extrudeSettings = {
-  //     depth: 0.5, // wall height
-  //     bevelEnabled: false,
-  //   }
-  //   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-  //   const material = new THREE.MeshBasicMaterial({
-  //     color: color,
-  //     side: THREE.DoubleSide,
-  //     // wireframe: true,
-  //   })
-  //   const wall = new THREE.Mesh(geometry, material)
-  //   wallEditor.scene.add(wall)
-  // }
-
-  // createSolidFill(line, color, previousLine) {
-  //   const direction = new THREE.Vector3()
-  //     .copy(line.end)
-  //     .sub(line.start)
-  //     .normalize()
-  //   const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
-  //   const wallWidth = 0.025 * line.width
-
-  //   let p1 = new THREE.Vector3()
-  //     .copy(line.start)
-  //     .addScaledVector(perpendicular, wallWidth / 2)
-  //   let p2 = new THREE.Vector3()
-  //     .copy(line.end)
-  //     .addScaledVector(perpendicular, wallWidth / 2)
-  //   let p3 = new THREE.Vector3()
-  //     .copy(line.end)
-  //     .addScaledVector(perpendicular, -wallWidth / 2)
-  //   let p4 = new THREE.Vector3()
-  //     .copy(line.start)
-  //     .addScaledVector(perpendicular, -wallWidth / 2)
-
-  //   // Check if the new line's start point matches the end point of the previous line
-  //   if (wallEditor.previousEndPoints.length > 0) {
-  //     const prevEndPoint =
-  //       wallEditor.previousEndPoints[wallEditor.previousEndPoints.length - 1]
-
-  //     if (
-  //       Math.abs(prevEndPoint.x - line.start.x) < 0.01 &&
-  //       Math.abs(prevEndPoint.y - line.start.y) < 0.01
-  //     ) {
-  //       console.log('Lines drawn from endpoints of each other.')
-  //       wallEditor.isLineConnected = true
-  //     }
-  //   }
-
-  //   if (
-  //     Math.abs(line.start.y - line.end.y) < 0.1 &&
-  //     wallEditor.isLineConnected
-  //   ) {
-  //     // if horizontal
-  //     p2.add(new THREE.Vector3(wallWidth / 2, 0, 0))
-  //     p3.sub(new THREE.Vector3(wallWidth / 2, 0, 0))
-  //   } else if (
-  //     Math.abs(line.start.x - line.end.x) < 0.05 &&
-  //     wallEditor.isLineConnected
-  //   ) {
-  //     // If vertical
-  //     p1.add(new THREE.Vector3(0, wallWidth / 2, 0))
-  //     p4.sub(new THREE.Vector3(0, wallWidth / 2, 0))
-  //   }
-  //   wallEditor.isLineConnected = false
-
-  //   const shape = new THREE.Shape([p1, p2, p3, p4])
-  //   const extrudeSettings = {
-  //     depth: 0.5, // wall height
-  //     bevelEnabled: false,
-  //   }
-  //   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
-  //   const material = new THREE.MeshBasicMaterial({
-  //     color: color,
-  //     side: THREE.DoubleSide,
-  //     // wireframe: true,
-  //   })
-  //   const wall = new THREE.Mesh(geometry, material)
-  //   wallEditor.scene.add(wall)
-
-  //   // Add current line's end point to the previousEndPoints array
-  //   wallEditor.previousEndPoints.push(line.end.clone())
-  // }
-
   createWhiteFill(p1, p2, p3, p4, color) {
     // Define vertices for the wall outline
     const vertices = [
@@ -401,21 +275,20 @@ class WallDrawer extends THREE.Object3D {
     const wall = new THREE.Line(geometry, material)
     wallEditor.scene.add(wall)
   }
-  createCrissCross(p1, p2, p3, p4, color, width, alignment) {
-    console.log(alignment)
+  createCrissCross(p1, p2, p3, p4,line) {
     const FIXED_TEXTURE_SIZE = 8 // Fixed texture size
     const TEXTURE_SCALE_FACTOR = 5 // Texture scale factor to zoom out
-    let LINE_SPACING_FACTOR = -(15 - wallEditor.spaceBetweenLines) // Factor to increase line spacing for top , bottom remove minus
-    if (alignment !== 'Center') {
+    let LINE_SPACING_FACTOR = -(15 - line.wallPatternSpaceBetweenLines) // Factor to increase line spacing for top , bottom remove minus
+    if (line.alignment !== 'Center') {
       LINE_SPACING_FACTOR = Math.abs(LINE_SPACING_FACTOR)
     }
 
     const textureLoader = new THREE.TextureLoader()
 
-    const texture = textureLoader.load(`/textures/${color}Cross.jpg`)
+    const texture = textureLoader.load(`/textures/${line.color}Cross.jpg`)
     texture.colorSpace = THREE.SRGBColorSpace
 
-    const colorTexture = textureLoader.load(`/textures/${color}Cross.jpg`)
+    const colorTexture = textureLoader.load(`/textures/${line.color}Cross.jpg`)
     colorTexture.colorSpace = THREE.SRGBColorSpace
 
     // Adjust texture filtering
@@ -447,7 +320,7 @@ class WallDrawer extends THREE.Object3D {
 
     // Calculate wall length and width
     const wallLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
-    const wallWidth = 0.025 * width
+    const wallWidth = 0.025 * line.width
 
     // Calculate texture repeat based on fixed texture size and scale factor
     const textureRepeatX =
@@ -511,31 +384,66 @@ class WallDrawer extends THREE.Object3D {
     const material = new THREE.MeshBasicMaterial({
       side: THREE.DoubleSide,
       map: colorTexture,
-      // color: color,
     })
 
     const wall = new THREE.Mesh(geometry, material)
 
     wallEditor.scene.add(wall)
+
+    // Create wall outline
+    this.createWallOutline(p1,p2,p3,p4, line.color)
+  
   }
-  createLinesPattern(p1, p2, p3, p4, color, width, alignment) {
+
+  createWallOutline(p1,p2,p3,p4,color){
+    const outlineVertices = [
+      p1.x, p1.y, 0,
+      p2.x, p2.y, 0,
+      p3.x, p3.y, 0,
+      p4.x, p4.y, 0,
+      p1.x, p1.y, 0.5,
+      p2.x, p2.y, 0.5,
+      p3.x, p3.y, 0.5,
+      p4.x, p4.y, 0.5,
+    ];
+  
+    // Indices for outline
+    const outlineIndices = [
+      0, 1, 1, 2, 2, 3, 3, 0,
+      4, 5, 5, 6, 6, 7, 7, 4,
+      0, 4, 1, 5, 2, 6, 3, 7
+    ];
+  
+    const outlineGeometry = new THREE.BufferGeometry();
+    outlineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(outlineVertices, 3));
+    outlineGeometry.setIndex(outlineIndices);
+  
+ 
+    const outlineMaterial = new THREE.LineBasicMaterial({ color: color });
+  
+    const outlineMesh = new THREE.LineSegments(outlineGeometry, outlineMaterial);
+    
+    wallEditor.scene.add(outlineMesh); 
+  }
+
+  createLinesPattern(p1, p2, p3, p4, line) {
     const FIXED_TEXTURE_SIZE = 8
     const TEXTURE_SCALE_FACTOR = 5 // Texture scale factor to zoom out
-    let LINE_SPACING_FACTOR = -(15 - wallEditor.spaceBetweenLines) // Factor to increase line spacing for top , bottom remove minus
-    if (alignment !== 'Center') {
+    let LINE_SPACING_FACTOR = -(15 - line.wallPatternSpaceBetweenLines) // Factor to increase line spacing for top , bottom remove minus
+    if (line.alignment !== 'Center') {
       LINE_SPACING_FACTOR = Math.abs(LINE_SPACING_FACTOR)
     }
 
     const textureLoader = new THREE.TextureLoader()
 
-    const texture = textureLoader.load(`/textures/${color}Stripe.jpg`)
+    const texture = textureLoader.load(`/textures/${line.color}Stripe.jpg`)
     texture.colorSpace = THREE.SRGBColorSpace
 
-    const colorTexture = textureLoader.load(`/textures/${color}Stripe.jpg`)
+    const colorTexture = textureLoader.load(`/textures/${line.color}Stripe.jpg`)
     colorTexture.colorSpace = THREE.SRGBColorSpace
 
-    texture.minFilter = THREE.LinearFilter
-    texture.magFilter = THREE.LinearFilter
+    texture.minFilter = THREE.LinearFilter //minFilter means when the texture is displayed at a size smaller than its original resolution  and THREE.LinearFilter produces smoother texture
+    texture.magFilter = THREE.LinearFilter //magFilter means when the texture is displayed at a size larger than its original resolution 
 
     const uvScale = (FIXED_TEXTURE_SIZE / 10) * TEXTURE_SCALE_FACTOR
 
@@ -558,9 +466,13 @@ class WallDrawer extends THREE.Object3D {
       0,
       LINE_SPACING_FACTOR,
     ]
+    //UV coordinates define how the texture is wrapped around the geometry,
+    //the renderer uses these UV coordinates to figure out which part of the texture should be mapped to each vertex of the geometry.
 
-    const wallLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
-    const wallWidth = 0.025 * width
+    const wallLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2) 
+    //this uses Pythagorean theorem to find distance between two points
+    //a2 + b2 = c2  ---> c === wallLength
+    const wallWidth = 0.025 * line.width
 
     // Calculate texture repeat based on fixed texture size and scale factor
     const textureRepeatX =
@@ -568,9 +480,11 @@ class WallDrawer extends THREE.Object3D {
     const textureRepeatY =
       (wallWidth / FIXED_TEXTURE_SIZE) * TEXTURE_SCALE_FACTOR
 
-    colorTexture.repeat.set(textureRepeatX, textureRepeatY)
-    colorTexture.wrapS = THREE.RepeatWrapping
-    colorTexture.wrapT = THREE.RepeatWrapping
+    colorTexture.repeat.set(textureRepeatX, textureRepeatY) //The repeat property determines how many times the texture should be repeated along each axis of the geometry.
+    colorTexture.wrapS = THREE.RepeatWrapping //horizontal axis (S)
+    colorTexture.wrapT = THREE.RepeatWrapping //vertical axis (T)
+
+    //From this part of the code is mostly related to geometry creation
 
     const vertices = [
       // Bottom face
@@ -630,6 +544,38 @@ class WallDrawer extends THREE.Object3D {
     const wall = new THREE.Mesh(geometry, material)
 
     wallEditor.scene.add(wall)
+
+
+    // Create outline vertices
+  const outlineVertices = [
+    p1.x, p1.y, 0,
+    p2.x, p2.y, 0,
+    p3.x, p3.y, 0,
+    p4.x, p4.y, 0,
+    p1.x, p1.y, 0.5,
+    p2.x, p2.y, 0.5,
+    p3.x, p3.y, 0.5,
+    p4.x, p4.y, 0.5,
+  ];
+
+  // Indices for outline
+  const outlineIndices = [
+    0, 1, 1, 2, 2, 3, 3, 0,
+    4, 5, 5, 6, 6, 7, 7, 4,
+    0, 4, 1, 5, 2, 6, 3, 7
+  ];
+
+  const outlineGeometry = new THREE.BufferGeometry();
+  outlineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(outlineVertices, 3));
+  outlineGeometry.setIndex(outlineIndices);
+
+  // Outline material
+  const outlineMaterial = new THREE.LineBasicMaterial({ color: line.color });
+
+  // Create outline mesh
+  const outlineMesh = new THREE.LineSegments(outlineGeometry, outlineMaterial);
+  
+  wallEditor.scene.add(outlineMesh); // Add outline to the scene
   }
 
   correctedWallIn3DView(line) {

@@ -5,13 +5,15 @@ class StaticComponents {
     scene.children.length = 0
   }
 
-  addLineData(startPoint, endPoint, lineWidth, alignment, color) {
+  addLineData() {
     wallEditor.linesArray.push({
-      start: startPoint,
-      end: endPoint,
-      width: lineWidth,
-      alignment: alignment,
-      color: color,
+      start: wallEditor.mousePoints[wallEditor.mousePoints.length - 2],
+      end: wallEditor.mousePoints[wallEditor.mousePoints.length - 1],
+      width: wallEditor.currentWidth,
+      alignment: wallEditor.currentAlignment,
+      color: wallEditor.color,
+      wallPatternSpaceBetweenLines: wallEditor.spaceBetweenLines,
+      wallPattern : wallEditor.currentWallPattern
     })
   }
 

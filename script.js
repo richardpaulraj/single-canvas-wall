@@ -1,33 +1,17 @@
 import * as THREE from 'three'
-import WallDrawer from './wallDrawer.js'
 import StaticComponents from './staticComponents.js'
 import { MouseClickActivity } from './controls.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-window.wallEditor = {
-  //scene
-  //aspect
-  //renderer
-  //controls
-  //camera
-  //currentWallPattern
-  //is3DView
-  //linesArray
-  //spaceBetweenLines
-  //color
-  //material
-}
+
+window.wallEditor = {}
 
 const scene = new THREE.Scene()
-const aspect = window.innerWidth / window.innerHeight
-wallEditor.aspect = aspect //wallEditor
-let camera = new THREE.OrthographicCamera(
-  -wallEditor.aspect,
-  wallEditor.aspect,
-  1,
-  -1,
-  0.1,
-  1000
-)
+wallEditor.aspect = window.innerWidth / window.innerHeight 
+
+
+
+
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById('canvas'),
   antialias: true,
@@ -35,49 +19,55 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setClearColor('white')
 
-camera.position.z = 5
-wallEditor.spaceBetweenLines = 1
-
-let controls = null
-
 const material = new THREE.MeshBasicMaterial({
   color: 'red',
   wireframe: false,
   side: THREE.DoubleSide,
 })
+wallEditor.orthographicCamera = new THREE.OrthographicCamera(
+  -wallEditor.aspect,
+  wallEditor.aspect,
+  1,
+  -1,
+  0.1,
+  1000
+)
+wallEditor.orthographicCamera.position.z = 5
 
-const mousePoints = []
-const linesArray = []
-let isMouseDown = false
-let is3DView = false
-let currentWidth = parseFloat(document.getElementById('wallWidthRange').value)
-let currentAlignment = 'Center'
-let currentWallPattern = 'solidFill'
-let color = 'red'
+wallEditor.perspectiveCamera = new THREE.PerspectiveCamera(
+  45,
+  wallEditor.aspect,
+  0.1,
+  1000
+)
+wallEditor.perspectiveCamera.position.z = 3
+
+
+wallEditor.spaceBetweenLines = 1
+wallEditor.mousePoints = []
+wallEditor.isMouseDown = false
 wallEditor.isLineConnected = false
 wallEditor.previousEndPoints = []
 wallEditor.wallLines = []
-
-wallEditor.currentWallPattern = currentWallPattern
-wallEditor.color = color
-wallEditor.is3DView = is3DView
-wallEditor.linesArray = linesArray
-wallEditor.currentWidth = currentWidth
+wallEditor.currentAlignment = "Center"
+wallEditor.currentWallPattern = 'solidFill'
+wallEditor.color = 'red'
+wallEditor.is3DView = false
+wallEditor.linesArray = []
+wallEditor.currentWidth = parseFloat(document.getElementById('wallWidthRange').value)
 wallEditor.material = material
 wallEditor.renderer = renderer
 wallEditor.scene = scene
-wallEditor.controls = controls
-wallEditor.camera = camera
-
-const wallDrawer = new WallDrawer()
-const staticComponents = new StaticComponents()
-const mouseClickActivity = new MouseClickActivity(
-  mousePoints,
-  currentAlignment,
-  staticComponents.addLineData,
-  staticComponents.clearScene,
-  wallDrawer
+wallEditor.camera = wallEditor.orthographicCamera
+wallEditor.lastMouseDownPosition = null 
+wallEditor.temporaryLine = null
+wallEditor.controls = new OrbitControls(
+  wallEditor.camera,
+  wallEditor.renderer.domElement
 )
+wallEditor.controls.enableRotate = false
 
+const staticComponents = new StaticComponents()
+const mouseClickActivity = new MouseClickActivity()
 mouseClickActivity.addEventListeners()
 staticComponents.animate()
