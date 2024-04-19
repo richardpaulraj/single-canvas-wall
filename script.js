@@ -61,12 +61,15 @@ wallEditor.scene = scene
 wallEditor.camera = wallEditor.orthographicCamera
 wallEditor.lastMouseDownPosition = null 
 wallEditor.temporaryLine = null
+wallEditor.temporaryOutline = null
+wallEditor.tempDotsGroup = new THREE.Group();
 wallEditor.controls = new OrbitControls(
   wallEditor.camera,
   wallEditor.renderer.domElement
 )
 wallEditor.controls.enableRotate = false
-
+wallEditor.dotsGroup = new THREE.Group();
+// wallEditor.tempArr = []
 const staticComponents = new StaticComponents()
 const mouseClickActivity = new MouseClickActivity()
 mouseClickActivity.addEventListeners()

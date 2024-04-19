@@ -1,3 +1,7 @@
+//3 forloops with lines array
+//1- corrected wall
+// 2 - 3d toggle 
+// 3- 2d toggle
 import * as THREE from 'three'
 import WallDrawer from './wallDrawer.js'
 import StaticComponents from './staticComponents.js'
@@ -34,14 +38,19 @@ class MouseClickActivity {
 
   onMouseDown(event) {
     wallEditor.isMouseDown = true
-    temporaryLine.clearTemporaryLine()
+    // temporaryLine.clearTemporaryLine()
     temporaryLine.handleTemporaryLine(event)
     wallEditor.lastMouseDownPosition = { x: event.clientX, y: event.clientY }
+  }
+  onMouseMove(event){
+    // if(wallEditor.isMouseDown){
+    //   temporaryLine.clearTemporaryLine()
+    //   console.log('claering')
+    // }
   }
 
   onMouseUp(event) {
     wallEditor.isMouseDown = false
-    temporaryLine.clearTemporaryLine()
 
     // Check if the mouse has moved between mousedown and mouseup
     if (
@@ -56,6 +65,9 @@ class MouseClickActivity {
 
     // Reset the last mouse down position
     wallEditor.lastMouseDownPosition = null
+    temporaryLine.clearTemporaryLine()
+    temporaryLine.clearTemporaryOutline()
+    temporaryLine.clearTempDots();
 
     wallEditor.mousePoints.length = 0
   }
@@ -84,6 +96,9 @@ class MouseClickActivity {
       wallEditor.mousePoints.push(intersection)
     } else {
       temporaryLine.clearTemporaryLine()
+      temporaryLine.clearTemporaryOutline()
+
+      temporaryLine.clearTempDots();
       temporaryLine.createTemporaryLine(
         wallEditor.mousePoints[wallEditor.mousePoints.length - 1],
         intersection
@@ -107,6 +122,8 @@ class MouseClickActivity {
       )
       document.addEventListener('mousedown', this.onMouseDown.bind(this))
       document.addEventListener('mouseup', this.onMouseUp.bind(this))
+      document.addEventListener('mousemove', this.onMouseMove.bind(this))
+
     }
     document.getElementById('threeDToggleBtn').addEventListener('click', () => {
       this.switchTo3DView()
@@ -171,11 +188,15 @@ class MouseClickActivity {
   switchTo3DView() {
     
     if (wallEditor.is3DView) {
+      staticComponents.clearScene(wallEditor.scene)
       wallEditor.camera = wallEditor.orthographicCamera
-      wallEditor.controls.object = wallEditor.camera;
+      wallEditor.controls.object = wallEditor.camera;//this updates the orbit control with the new camera
       wallEditor.controls.enableRotate = false 
+      wallEditor.dotsGroup.visible = true;
       wallEditor.linesArray.forEach((line) => wallDrawer.draw2DWall(line))
       this.toggleBtns2D()
+
+      // Hide the dots in 3D view
     } else {
       if (wallEditor.linesArray.length === 0) {
         alert('Draw something to see in 3D View')
@@ -185,6 +206,8 @@ class MouseClickActivity {
       wallEditor.controls.object = wallEditor.camera;
       wallEditor.controls.enableRotate = true 
 
+      // Hide the dots in 3D view
+      wallEditor.dotsGroup.visible = false;
       wallEditor.linesArray.forEach((line) => wallDrawer.draw3DWall(line))
       this.toggleBtns3D()
     }

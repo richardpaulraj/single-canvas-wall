@@ -1,15 +1,18 @@
+//1 forloop
 import * as THREE from 'three'
+
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+
 
 class WallDrawer extends THREE.Object3D {
   constructor() {
     super()
     this.wallEdge3DMesh = new THREE.Mesh(new THREE.BufferGeometry())
     this.add(this.wallEdge3DMesh)
+    
   }
 
   draw2DWall(line) {
-
-
     console.log(line)
     const direction = new THREE.Vector3()
       .copy(line.end)
@@ -18,6 +21,7 @@ class WallDrawer extends THREE.Object3D {
 
     const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
     const wallWidth = 0.025 * line.width
+
 
     if (line.alignment === 'Top') {
       const p1 = new THREE.Vector3()
@@ -31,26 +35,14 @@ class WallDrawer extends THREE.Object3D {
       const p4 = new THREE.Vector3().copy(line.start)
       // .addScaledVector(perpendicular, -wallWidth / 2)
       if (line.wallPattern === 'solidFill') {
-        this.createSolidFill(p1, p2, p3, p4, line.color)
-      } else if (line.wallPattern  === 'whiteFill') {
-        this.createWhiteFill(p1, p2, p3, p4, line.color)
-      } else if (line.wallPattern  === 'crissCross') {
-        this.createCrissCross(
-          p1,
-          p2,
-          p3,
-          p4,
-          line
-        )
-      } else if (line.wallPattern  === 'lines') {
-        this.createLinesPattern(
-          p1,
-          p2,
-          p3,
-          p4,
-
-          line
-        )
+        this.createSolidFill(p1, p2, p3, p4, line.color);
+       this.createWallOutline(p1, p2, p3, p4, line.color);
+      } else if (line.wallPattern === 'whiteFill') {
+        this.createWhiteFill(p1, p2, p3, p4, line.color);
+      } else if (line.wallPattern === 'crissCross') {
+        this.createCrissCross(p1, p2, p3, p4, line);
+      } else if (line.wallPattern === 'lines') {
+        this.createLinesPattern(p1, p2, p3, p4, line);
       }
     } else if (line.alignment === 'Bottom') {
       const p1 = new THREE.Vector3().copy(line.start)
@@ -64,27 +56,17 @@ class WallDrawer extends THREE.Object3D {
         .copy(line.start)
         .addScaledVector(perpendicular, wallWidth)
 
-      if (line.wallPattern  === 'solidFill') {
-        this.createSolidFill(p1, p2, p3, p4, line.color)
-      } else if (line.wallPattern  === 'whiteFill') {
-        this.createWhiteFill(p1, p2, p3, p4, line.color)
-      } else if (line.wallPattern  === 'crissCross') {
-        this.createCrissCross(
-          p1,
-          p2,
-          p3,
-          p4,
-          line
-        )
-      } else if (line.wallPattern  === 'lines') {
-        this.createLinesPattern(
-          p1,
-          p2,
-          p3,
-          p4,
-          line
-        )
-      }
+        if (line.wallPattern === 'solidFill') {
+          this.createSolidFill(p1, p2, p3, p4, line.color);
+          this.createWallOutline(p1, p2, p3, p4, line.color);
+        } else if (line.wallPattern === 'whiteFill') {
+          this.createWhiteFill(p1, p2, p3, p4, line.color);
+        } else if (line.wallPattern === 'crissCross') {
+          this.createCrissCross(p1, p2, p3, p4, line);
+        } else if (line.wallPattern === 'lines') {
+          this.createLinesPattern(p1, p2, p3, p4, line);
+        }
+      
     } else if (line.alignment === 'Center') {
       const p1 = new THREE.Vector3()
         .copy(line.start)
@@ -98,28 +80,21 @@ class WallDrawer extends THREE.Object3D {
       const p4 = new THREE.Vector3()
         .copy(line.start)
         .addScaledVector(perpendicular, -wallWidth / 2)
-      if (line.wallPattern  === 'solidFill') {
-        this.createSolidFill(p1, p2, p3, p4, line.color, line.width)
-      } else if (line.wallPattern  === 'whiteFill') {
-        this.createWhiteFill(p1, p2, p3, p4, line.color)
-      } else if (line.wallPattern  === 'crissCross') {
-        this.createCrissCross(
-          p1,
-          p2,
-          p3,
-          p4,
-          line
-        )
-      } else if (line.wallPattern  === 'lines') {
-        this.createLinesPattern(
-          p1,
-          p2,
-          p3,
-          p4,
-          line
-        )
-      }
+        if (line.wallPattern === 'solidFill') {
+          this.createSolidFill(p1, p2, p3, p4, line.color);
+          // wallEditor.tempArr.push(this.createSolidFill(p1, p2, p3, p4, line.color))
+
+          // console.log(this.createSolidFill(p1, p2, p3, p4, line.color))
+          this.createWallOutline(p1, p2, p3, p4, line.color);
+        } else if (line.wallPattern === 'whiteFill') {
+          this.createWhiteFill(p1, p2, p3, p4, line.color);
+        } else if (line.wallPattern === 'crissCross') {
+          this.createCrissCross(p1, p2, p3, p4, line);
+        } else if (line.wallPattern === 'lines') {
+          this.createLinesPattern(p1, p2, p3, p4, line);
+        }
     }
+    // console.log(wallEditor.tempArr)
   }
 
   draw3DWall(line) {
@@ -230,50 +205,58 @@ class WallDrawer extends THREE.Object3D {
     })
     const wall = new THREE.Mesh(geometry, material)
     wallEditor.scene.add(wall)
+
+    // this.createWallOutline(p1, p2, p3, p4, color)
+    return wall
   }
 
+  // createWhiteFill(p1, p2, p3, p4, color) {
+  //   // Define vertices for the wall outline
+  //   const vertices = [
+  //     p1.x,
+  //     p1.y,
+  //     p1.z, // Vertex 0
+  //     p2.x,
+  //     p2.y,
+  //     p2.z, // Vertex 1
+  //     p3.x,
+  //     p3.y,
+  //     p3.z, // Vertex 2
+  //     p4.x,
+  //     p4.y,
+  //     p4.z, // Vertex 3
+  //   ]
+
+  //   // Define indices for the wall outline
+  //   const indices = [
+  //     0,
+  //     1, // Line segment from Vertex 0 to Vertex 1
+  //     1,
+  //     2, // Line segment from Vertex 1 to Vertex 2
+  //     2,
+  //     3,
+  //     3,
+  //     0,
+  //   ]
+
+  //   const geometry = new THREE.BufferGeometry()
+  //   geometry.setAttribute(
+  //     'position',
+  //     new THREE.Float32BufferAttribute(vertices, 3)
+  //   )
+  //   geometry.setIndex(indices)
+  //   const material = new THREE.MeshBasicMaterial({
+  //     color: color,
+  //     side: THREE.DoubleSide,
+      
+  //   })
+
+  //   const wall = new THREE.Line(geometry, material)
+  //   wallEditor.scene.add(wall)
+  // }
+
   createWhiteFill(p1, p2, p3, p4, color) {
-    // Define vertices for the wall outline
-    const vertices = [
-      p1.x,
-      p1.y,
-      p1.z, // Vertex 0
-      p2.x,
-      p2.y,
-      p2.z, // Vertex 1
-      p3.x,
-      p3.y,
-      p3.z, // Vertex 2
-      p4.x,
-      p4.y,
-      p4.z, // Vertex 3
-    ]
-
-    // Define indices for the wall outline
-    const indices = [
-      0,
-      1, // Line segment from Vertex 0 to Vertex 1
-      1,
-      2, // Line segment from Vertex 1 to Vertex 2
-      2,
-      3,
-      3,
-      0,
-    ]
-
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(vertices, 3)
-    )
-    geometry.setIndex(indices)
-    const material = new THREE.MeshBasicMaterial({
-      color: color,
-      side: THREE.DoubleSide,
-    })
-
-    const wall = new THREE.Line(geometry, material)
-    wallEditor.scene.add(wall)
+    this.createWallOutline(p1, p2, p3, p4, color)
   }
   createCrissCross(p1, p2, p3, p4,line) {
     const FIXED_TEXTURE_SIZE = 8 // Fixed texture size
@@ -395,35 +378,78 @@ class WallDrawer extends THREE.Object3D {
   
   }
 
-  createWallOutline(p1,p2,p3,p4,color){
+  
+  createWallOutline(p1, p2, p3, p4, color) {
+    // Define the four corner points of the wall
+    const cornerPoints = [
+      { x: p1.x, y: p1.y },
+      { x: p2.x, y: p2.y },
+      { x: p3.x, y: p3.y },
+      { x: p4.x, y: p4.y }
+    ];
+  
+    // Calculate center points
+    const centerPoints = [
+      {
+        x: (cornerPoints[0].x + cornerPoints[1].x) / 2,
+        y: (cornerPoints[0].y + cornerPoints[1].y) / 2
+      },
+      {
+        x: (cornerPoints[1].x + cornerPoints[2].x) / 2,
+        y: (cornerPoints[1].y + cornerPoints[2].y) / 2
+      },
+      {
+        x: (cornerPoints[2].x + cornerPoints[3].x) / 2,
+        y: (cornerPoints[2].y + cornerPoints[3].y) / 2
+      },
+      {
+        x: (cornerPoints[3].x + cornerPoints[0].x) / 2,
+        y: (cornerPoints[3].y + cornerPoints[0].y) / 2
+      },
+    ];
+  
     const outlineVertices = [
-      p1.x, p1.y, 0,
-      p2.x, p2.y, 0,
-      p3.x, p3.y, 0,
-      p4.x, p4.y, 0,
-      p1.x, p1.y, 0.5,
-      p2.x, p2.y, 0.5,
-      p3.x, p3.y, 0.5,
-      p4.x, p4.y, 0.5,
+      cornerPoints[0].x, cornerPoints[0].y, 0,
+      cornerPoints[1].x, cornerPoints[1].y, 0,
+      cornerPoints[1].x, cornerPoints[1].y, 0,
+      cornerPoints[2].x, cornerPoints[2].y, 0,
+      cornerPoints[2].x, cornerPoints[2].y, 0,//bottom line
+      cornerPoints[3].x, cornerPoints[3].y, 0,
+      cornerPoints[3].x, cornerPoints[3].y, 0,//left Line
+      cornerPoints[0].x, cornerPoints[0].y, 0,
+
     ];
   
     // Indices for outline
     const outlineIndices = [
-      0, 1, 1, 2, 2, 3, 3, 0,
-      4, 5, 5, 6, 6, 7, 7, 4,
-      0, 4, 1, 5, 2, 6, 3, 7
+      0, 1, 2, 3, 4, 5, 6, 7,  
     ];
   
     const outlineGeometry = new THREE.BufferGeometry();
     outlineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(outlineVertices, 3));
     outlineGeometry.setIndex(outlineIndices);
   
- 
     const outlineMaterial = new THREE.LineBasicMaterial({ color: color });
   
     const outlineMesh = new THREE.LineSegments(outlineGeometry, outlineMaterial);
+  
+    // Add corner points as spheres
+    const sphereGeometry = new THREE.SphereGeometry(0.01, 32, 32);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: '#9BCF53', depthTest:false }); //This ensures that the dots will be rendered on top of other objects, irrespective of their depth in the scene.
     
-    wallEditor.scene.add(outlineMesh); 
+  
+
+    // Create a group to hold the spheres
+
+    [...cornerPoints, ...centerPoints].forEach((point) => {
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      sphere.position.set(point.x, point.y, 0);
+      wallEditor.dotsGroup.add(sphere);
+    });
+
+    wallEditor.dotsGroup.visible = true; // Initially hide the dots
+    wallEditor.scene.add(wallEditor.dotsGroup); // Add the dotsGroup to the scene
+    wallEditor.scene.add(outlineMesh);
   }
 
   createLinesPattern(p1, p2, p3, p4, line) {
@@ -545,37 +571,7 @@ class WallDrawer extends THREE.Object3D {
 
     wallEditor.scene.add(wall)
 
-
-    // Create outline vertices
-  const outlineVertices = [
-    p1.x, p1.y, 0,
-    p2.x, p2.y, 0,
-    p3.x, p3.y, 0,
-    p4.x, p4.y, 0,
-    p1.x, p1.y, 0.5,
-    p2.x, p2.y, 0.5,
-    p3.x, p3.y, 0.5,
-    p4.x, p4.y, 0.5,
-  ];
-
-  // Indices for outline
-  const outlineIndices = [
-    0, 1, 1, 2, 2, 3, 3, 0,
-    4, 5, 5, 6, 6, 7, 7, 4,
-    0, 4, 1, 5, 2, 6, 3, 7
-  ];
-
-  const outlineGeometry = new THREE.BufferGeometry();
-  outlineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(outlineVertices, 3));
-  outlineGeometry.setIndex(outlineIndices);
-
-  // Outline material
-  const outlineMaterial = new THREE.LineBasicMaterial({ color: line.color });
-
-  // Create outline mesh
-  const outlineMesh = new THREE.LineSegments(outlineGeometry, outlineMaterial);
-  
-  wallEditor.scene.add(outlineMesh); // Add outline to the scene
+    this.createWallOutline(p1, p2, p3, p4, line.color)
   }
 
   correctedWallIn3DView(line) {
