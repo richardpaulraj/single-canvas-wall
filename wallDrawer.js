@@ -1,15 +1,13 @@
 //1 forloop
 import * as THREE from 'three'
 
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader'
 
 class WallDrawer extends THREE.Object3D {
   constructor() {
     super()
     this.wallEdge3DMesh = new THREE.Mesh(new THREE.BufferGeometry())
     this.add(this.wallEdge3DMesh)
-    
   }
 
   draw2DWall(line) {
@@ -21,7 +19,6 @@ class WallDrawer extends THREE.Object3D {
 
     const perpendicular = new THREE.Vector3(-direction.y, direction.x, 0)
     const wallWidth = 0.025 * line.width
-
 
     if (line.alignment === 'Top') {
       const p1 = new THREE.Vector3()
@@ -35,14 +32,14 @@ class WallDrawer extends THREE.Object3D {
       const p4 = new THREE.Vector3().copy(line.start)
       // .addScaledVector(perpendicular, -wallWidth / 2)
       if (line.wallPattern === 'solidFill') {
-        this.createSolidFill(p1, p2, p3, p4, line.color);
-       this.createWallOutline(p1, p2, p3, p4, line.color);
+        this.createSolidFill(p1, p2, p3, p4, line.color)
+        this.createWallOutline(p1, p2, p3, p4, line.color)
       } else if (line.wallPattern === 'whiteFill') {
-        this.createWhiteFill(p1, p2, p3, p4, line.color);
+        this.createWhiteFill(p1, p2, p3, p4, line.color)
       } else if (line.wallPattern === 'crissCross') {
-        this.createCrissCross(p1, p2, p3, p4, line);
+        this.createCrissCross(p1, p2, p3, p4, line)
       } else if (line.wallPattern === 'lines') {
-        this.createLinesPattern(p1, p2, p3, p4, line);
+        this.createLinesPattern(p1, p2, p3, p4, line)
       }
     } else if (line.alignment === 'Bottom') {
       const p1 = new THREE.Vector3().copy(line.start)
@@ -56,17 +53,16 @@ class WallDrawer extends THREE.Object3D {
         .copy(line.start)
         .addScaledVector(perpendicular, wallWidth)
 
-        if (line.wallPattern === 'solidFill') {
-          this.createSolidFill(p1, p2, p3, p4, line.color);
-          this.createWallOutline(p1, p2, p3, p4, line.color);
-        } else if (line.wallPattern === 'whiteFill') {
-          this.createWhiteFill(p1, p2, p3, p4, line.color);
-        } else if (line.wallPattern === 'crissCross') {
-          this.createCrissCross(p1, p2, p3, p4, line);
-        } else if (line.wallPattern === 'lines') {
-          this.createLinesPattern(p1, p2, p3, p4, line);
-        }
-      
+      if (line.wallPattern === 'solidFill') {
+        this.createSolidFill(p1, p2, p3, p4, line.color)
+        this.createWallOutline(p1, p2, p3, p4, line.color)
+      } else if (line.wallPattern === 'whiteFill') {
+        this.createWhiteFill(p1, p2, p3, p4, line.color)
+      } else if (line.wallPattern === 'crissCross') {
+        this.createCrissCross(p1, p2, p3, p4, line)
+      } else if (line.wallPattern === 'lines') {
+        this.createLinesPattern(p1, p2, p3, p4, line)
+      }
     } else if (line.alignment === 'Center') {
       const p1 = new THREE.Vector3()
         .copy(line.start)
@@ -80,19 +76,19 @@ class WallDrawer extends THREE.Object3D {
       const p4 = new THREE.Vector3()
         .copy(line.start)
         .addScaledVector(perpendicular, -wallWidth / 2)
-        if (line.wallPattern === 'solidFill') {
-          this.createSolidFill(p1, p2, p3, p4, line.color);
-          // wallEditor.tempArr.push(this.createSolidFill(p1, p2, p3, p4, line.color))
+      if (line.wallPattern === 'solidFill') {
+        this.createSolidFill(p1, p2, p3, p4, line.color)
+        // wallEditor.tempArr.push(this.createSolidFill(p1, p2, p3, p4, line.color))
 
-          // console.log(this.createSolidFill(p1, p2, p3, p4, line.color))
-          this.createWallOutline(p1, p2, p3, p4, line.color);
-        } else if (line.wallPattern === 'whiteFill') {
-          this.createWhiteFill(p1, p2, p3, p4, line.color);
-        } else if (line.wallPattern === 'crissCross') {
-          this.createCrissCross(p1, p2, p3, p4, line);
-        } else if (line.wallPattern === 'lines') {
-          this.createLinesPattern(p1, p2, p3, p4, line);
-        }
+        // console.log(this.createSolidFill(p1, p2, p3, p4, line.color))
+        this.createWallOutline(p1, p2, p3, p4, line.color)
+      } else if (line.wallPattern === 'whiteFill') {
+        this.createWhiteFill(p1, p2, p3, p4, line.color)
+      } else if (line.wallPattern === 'crissCross') {
+        this.createCrissCross(p1, p2, p3, p4, line)
+      } else if (line.wallPattern === 'lines') {
+        this.createLinesPattern(p1, p2, p3, p4, line)
+      }
     }
     // console.log(wallEditor.tempArr)
   }
@@ -248,7 +244,7 @@ class WallDrawer extends THREE.Object3D {
   //   const material = new THREE.MeshBasicMaterial({
   //     color: color,
   //     side: THREE.DoubleSide,
-      
+
   //   })
 
   //   const wall = new THREE.Line(geometry, material)
@@ -258,29 +254,16 @@ class WallDrawer extends THREE.Object3D {
   createWhiteFill(p1, p2, p3, p4, color) {
     this.createWallOutline(p1, p2, p3, p4, color)
   }
-  createCrissCross(p1, p2, p3, p4,line) {
+  createCrissCross(p1, p2, p3, p4, line) {
     const FIXED_TEXTURE_SIZE = 8 // Fixed texture size
     const TEXTURE_SCALE_FACTOR = 5 // Texture scale factor to zoom out
     let LINE_SPACING_FACTOR = -(15 - line.wallPatternSpaceBetweenLines) // Factor to increase line spacing for top , bottom remove minus
     if (line.alignment !== 'Center') {
       LINE_SPACING_FACTOR = Math.abs(LINE_SPACING_FACTOR)
     }
-
     const textureLoader = new THREE.TextureLoader()
-
-    const texture = textureLoader.load(`/textures/${line.color}Cross.jpg`)
-    texture.colorSpace = THREE.SRGBColorSpace
-
     const colorTexture = textureLoader.load(`/textures/${line.color}Cross.jpg`)
-    colorTexture.colorSpace = THREE.SRGBColorSpace
-
-    // Adjust texture filtering
-    texture.minFilter = THREE.LinearFilter
-    texture.magFilter = THREE.LinearFilter
-
-    // Calculate UV scale based on fixed texture size and scale factor
     const uvScale = (FIXED_TEXTURE_SIZE / 10) * TEXTURE_SCALE_FACTOR
-
     const uvs = [
       0,
       0,
@@ -374,103 +357,109 @@ class WallDrawer extends THREE.Object3D {
     wallEditor.scene.add(wall)
 
     // Create wall outline
-    this.createWallOutline(p1,p2,p3,p4, line.color)
-  
+    this.createWallOutline(p1, p2, p3, p4, line.color)
   }
 
-  
   createWallOutline(p1, p2, p3, p4, color) {
     // Define the four corner points of the wall
     const cornerPoints = [
       { x: p1.x, y: p1.y },
       { x: p2.x, y: p2.y },
       { x: p3.x, y: p3.y },
-      { x: p4.x, y: p4.y }
-    ];
-  
+      { x: p4.x, y: p4.y },
+    ]
+
     // Calculate center points
     const centerPoints = [
       {
         x: (cornerPoints[0].x + cornerPoints[1].x) / 2,
-        y: (cornerPoints[0].y + cornerPoints[1].y) / 2
+        y: (cornerPoints[0].y + cornerPoints[1].y) / 2,
       },
       {
         x: (cornerPoints[1].x + cornerPoints[2].x) / 2,
-        y: (cornerPoints[1].y + cornerPoints[2].y) / 2
+        y: (cornerPoints[1].y + cornerPoints[2].y) / 2,
       },
       {
         x: (cornerPoints[2].x + cornerPoints[3].x) / 2,
-        y: (cornerPoints[2].y + cornerPoints[3].y) / 2
+        y: (cornerPoints[2].y + cornerPoints[3].y) / 2,
       },
       {
         x: (cornerPoints[3].x + cornerPoints[0].x) / 2,
-        y: (cornerPoints[3].y + cornerPoints[0].y) / 2
+        y: (cornerPoints[3].y + cornerPoints[0].y) / 2,
       },
-    ];
-  
-    const outlineVertices = [
-      cornerPoints[0].x, cornerPoints[0].y, 0,
-      cornerPoints[1].x, cornerPoints[1].y, 0,
-      cornerPoints[1].x, cornerPoints[1].y, 0,
-      cornerPoints[2].x, cornerPoints[2].y, 0,
-      cornerPoints[2].x, cornerPoints[2].y, 0,//bottom line
-      cornerPoints[3].x, cornerPoints[3].y, 0,
-      cornerPoints[3].x, cornerPoints[3].y, 0,//left Line
-      cornerPoints[0].x, cornerPoints[0].y, 0,
+    ]
 
-    ];
-  
+    const outlineVertices = [
+      cornerPoints[0].x,
+      cornerPoints[0].y,
+      0,
+      cornerPoints[1].x,
+      cornerPoints[1].y,
+      0,
+      cornerPoints[1].x,
+      cornerPoints[1].y,
+      0,
+      cornerPoints[2].x,
+      cornerPoints[2].y,
+      0,
+      cornerPoints[2].x,
+      cornerPoints[2].y,
+      0, //bottom line
+      cornerPoints[3].x,
+      cornerPoints[3].y,
+      0,
+      cornerPoints[3].x,
+      cornerPoints[3].y,
+      0, //left Line
+      cornerPoints[0].x,
+      cornerPoints[0].y,
+      0,
+    ]
+
     // Indices for outline
-    const outlineIndices = [
-      0, 1, 2, 3, 4, 5, 6, 7,  
-    ];
-  
-    const outlineGeometry = new THREE.BufferGeometry();
-    outlineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(outlineVertices, 3));
-    outlineGeometry.setIndex(outlineIndices);
-  
-    const outlineMaterial = new THREE.LineBasicMaterial({ color: color });
-  
-    const outlineMesh = new THREE.LineSegments(outlineGeometry, outlineMaterial);
-  
+    const outlineIndices = [0, 1, 2, 3, 4, 5, 6, 7]
+
+    const outlineGeometry = new THREE.BufferGeometry()
+    outlineGeometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(outlineVertices, 3)
+    )
+    outlineGeometry.setIndex(outlineIndices)
+
+    const outlineMaterial = new THREE.LineBasicMaterial({ color: color })
+
+    const outlineMesh = new THREE.LineSegments(outlineGeometry, outlineMaterial)
+
     // Add corner points as spheres
-    const sphereGeometry = new THREE.SphereGeometry(0.01, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({ color: '#9BCF53', depthTest:false }); //This ensures that the dots will be rendered on top of other objects, irrespective of their depth in the scene.
-    
-  
+    const sphereGeometry = new THREE.SphereGeometry(0.01, 32, 32)
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+      color: '#9BCF53',
+      depthTest: false,
+    }) //This ensures that the dots will be rendered on top of other objects, irrespective of their depth in the scene.
 
     // Create a group to hold the spheres
 
-    [...cornerPoints, ...centerPoints].forEach((point) => {
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-      sphere.position.set(point.x, point.y, 0);
-      wallEditor.dotsGroup.add(sphere);
-    });
+    ;[...cornerPoints, ...centerPoints].forEach((point) => {
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+      sphere.position.set(point.x, point.y, 0)
+      wallEditor.dotsGroup.add(sphere)
+    })
 
-    wallEditor.dotsGroup.visible = true; // Initially hide the dots
-    wallEditor.scene.add(wallEditor.dotsGroup); // Add the dotsGroup to the scene
-    wallEditor.scene.add(outlineMesh);
+    wallEditor.dotsGroup.visible = true // Initially hide the dots
+    wallEditor.scene.add(wallEditor.dotsGroup) // Add the dotsGroup to the scene
+    wallEditor.scene.add(outlineMesh)
   }
 
   createLinesPattern(p1, p2, p3, p4, line) {
     const FIXED_TEXTURE_SIZE = 8
     const TEXTURE_SCALE_FACTOR = 5 // Texture scale factor to zoom out
-    let LINE_SPACING_FACTOR = -(15 - line.wallPatternSpaceBetweenLines) // Factor to increase line spacing for top , bottom remove minus
+    let LINE_SPACING_FACTOR = -(15 - line.wallPatternSpaceBetweenLines) // Factor to increase line spacing.  for top and bottom remove minus w Math.abs
     if (line.alignment !== 'Center') {
       LINE_SPACING_FACTOR = Math.abs(LINE_SPACING_FACTOR)
     }
 
     const textureLoader = new THREE.TextureLoader()
-
-    const texture = textureLoader.load(`/textures/${line.color}Stripe.jpg`)
-    texture.colorSpace = THREE.SRGBColorSpace
-
     const colorTexture = textureLoader.load(`/textures/${line.color}Stripe.jpg`)
-    colorTexture.colorSpace = THREE.SRGBColorSpace
-
-    texture.minFilter = THREE.LinearFilter //minFilter means when the texture is displayed at a size smaller than its original resolution  and THREE.LinearFilter produces smoother texture
-    texture.magFilter = THREE.LinearFilter //magFilter means when the texture is displayed at a size larger than its original resolution 
-
     const uvScale = (FIXED_TEXTURE_SIZE / 10) * TEXTURE_SCALE_FACTOR
 
     const uvs = [
@@ -495,7 +484,7 @@ class WallDrawer extends THREE.Object3D {
     //UV coordinates define how the texture is wrapped around the geometry,
     //the renderer uses these UV coordinates to figure out which part of the texture should be mapped to each vertex of the geometry.
 
-    const wallLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2) 
+    const wallLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
     //this uses Pythagorean theorem to find distance between two points
     //a2 + b2 = c2  ---> c === wallLength
     const wallWidth = 0.025 * line.width

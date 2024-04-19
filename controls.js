@@ -1,6 +1,6 @@
 //3 forloops with lines array
 //1- corrected wall
-// 2 - 3d toggle 
+// 2 - 3d toggle
 // 3- 2d toggle
 import * as THREE from 'three'
 import WallDrawer from './wallDrawer.js'
@@ -12,7 +12,6 @@ const staticComponents = new StaticComponents()
 const temporaryLine = new TemporaryLine()
 
 class MouseClickActivity {
-
   constructor() {}
 
   toggleBtns3D() {
@@ -42,7 +41,7 @@ class MouseClickActivity {
     temporaryLine.handleTemporaryLine(event)
     wallEditor.lastMouseDownPosition = { x: event.clientX, y: event.clientY }
   }
-  onMouseMove(event){
+  onMouseMove(event) {
     // if(wallEditor.isMouseDown){
     //   temporaryLine.clearTemporaryLine()
     //   console.log('claering')
@@ -54,12 +53,13 @@ class MouseClickActivity {
 
     // Check if the mouse has moved between mousedown and mouseup
     if (
-      !wallEditor.is3DView && wallEditor.lastMouseDownPosition && 
+      !wallEditor.is3DView &&
+      wallEditor.lastMouseDownPosition &&
       (wallEditor.lastMouseDownPosition.x !== event.clientX ||
         wallEditor.lastMouseDownPosition.y !== event.clientY)
     ) {
       // Call addPoint only if the mouse has moved
-      this.addPoint(event)
+      this.update(event)
       wallEditor.mousePoints.length = 0
     }
 
@@ -67,13 +67,13 @@ class MouseClickActivity {
     wallEditor.lastMouseDownPosition = null
     temporaryLine.clearTemporaryLine()
     temporaryLine.clearTemporaryOutline()
-    temporaryLine.clearTempDots();
+    temporaryLine.clearTempDots()
 
     wallEditor.mousePoints.length = 0
   }
 
-  addPoint(event) {
-
+  //Changed addpoints to update
+  update(event) {
     const mouse = new THREE.Vector2(
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
@@ -83,9 +83,7 @@ class MouseClickActivity {
     const intersection = new THREE.Vector3()
     raycaster.ray.intersectPlane(
       new THREE.Plane(
-        new THREE.Vector3(0, 0, 1).applyMatrix4(
-          wallEditor.camera.matrixWorld
-        ),
+        new THREE.Vector3(0, 0, 1).applyMatrix4(wallEditor.camera.matrixWorld),
         0
       ),
       intersection
@@ -98,12 +96,12 @@ class MouseClickActivity {
       temporaryLine.clearTemporaryLine()
       temporaryLine.clearTemporaryOutline()
 
-      temporaryLine.clearTempDots();
+      temporaryLine.clearTempDots()
       temporaryLine.createTemporaryLine(
         wallEditor.mousePoints[wallEditor.mousePoints.length - 1],
         intersection
       )
-      }
+    }
 
     wallEditor.mousePoints.push(intersection)
 
@@ -113,8 +111,8 @@ class MouseClickActivity {
 
       wallDrawer.draw2DWall(latestLine)
     }
-    }
-  
+  }
+
   addEventListeners() {
     if (!wallEditor.is3DView) {
       document.addEventListener('mousemove', (event) =>
@@ -123,7 +121,6 @@ class MouseClickActivity {
       document.addEventListener('mousedown', this.onMouseDown.bind(this))
       document.addEventListener('mouseup', this.onMouseUp.bind(this))
       document.addEventListener('mousemove', this.onMouseMove.bind(this))
-
     }
     document.getElementById('threeDToggleBtn').addEventListener('click', () => {
       this.switchTo3DView()
@@ -186,13 +183,12 @@ class MouseClickActivity {
       })
   }
   switchTo3DView() {
-    
     if (wallEditor.is3DView) {
-      staticComponents.clearScene(wallEditor.scene)
+      // staticComponents.clearScene(wallEditor.scene)
       wallEditor.camera = wallEditor.orthographicCamera
-      wallEditor.controls.object = wallEditor.camera;//this updates the orbit control with the new camera
-      wallEditor.controls.enableRotate = false 
-      wallEditor.dotsGroup.visible = true;
+      wallEditor.controls.object = wallEditor.camera //this updates the orbit control with the new camera
+      wallEditor.controls.enableRotate = false
+      wallEditor.dotsGroup.visible = true
       wallEditor.linesArray.forEach((line) => wallDrawer.draw2DWall(line))
       this.toggleBtns2D()
 
@@ -203,11 +199,11 @@ class MouseClickActivity {
         return
       }
       wallEditor.camera = wallEditor.perspectiveCamera
-      wallEditor.controls.object = wallEditor.camera;
-      wallEditor.controls.enableRotate = true 
+      wallEditor.controls.object = wallEditor.camera
+      wallEditor.controls.enableRotate = true
 
       // Hide the dots in 3D view
-      wallEditor.dotsGroup.visible = false;
+      wallEditor.dotsGroup.visible = false
       wallEditor.linesArray.forEach((line) => wallDrawer.draw3DWall(line))
       this.toggleBtns3D()
     }
