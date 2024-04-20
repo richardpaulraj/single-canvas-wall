@@ -3,7 +3,17 @@ class StaticComponents {
 
   clearScene(scene) {
     scene.children.length = 0
-    wallEditor.dotsGroup.clear(); 
+    wallEditor.dotsGroup.clear();
+    wallEditor.firstNewP1 = null
+    wallEditor.lastEndPoint = null
+    wallEditor.subAreafirstLineDrawn = false;
+    wallEditor.allVerticesofSubArea = [];
+  
+    wallEditor.isSubAreaActivated = false;
+
+    
+
+ 
     // wallEditor.tempArr[0].visible = true
     // wallEditor.renderer.render(wallEditor.scene, wallEditor.camera);
     // console.log(wallEditor.linesArray)

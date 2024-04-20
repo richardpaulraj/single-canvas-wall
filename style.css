@@ -113,3 +113,15 @@ canvas {
   display: block;
   cursor: pointer;
 }
+
+#subAreaBtn {
+  position: absolute;
+  top: 330px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: block;
+  cursor: pointer;
+}

@@ -33,7 +33,7 @@ class TemporaryLine {
   }
 
   handleTemporaryLine(event) {
-    if (!wallEditor.is3DView && wallEditor.isMouseDown) {
+    if (!wallEditor.is3DView && wallEditor.isMouseDown && !wallEditor.isSubAreaActivated) {
       const mouse = new THREE.Vector2(
         (event.clientX / window.innerWidth) * 2 - 1,
         -(event.clientY / window.innerHeight) * 2 + 1

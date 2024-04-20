@@ -69,6 +69,13 @@ wallEditor.controls = new OrbitControls(
 )
 wallEditor.controls.enableRotate = false
 wallEditor.dotsGroup = new THREE.Group();
+
+wallEditor.isSubAreaActivated = false
+
+wallEditor.lastEndPoint = null
+wallEditor.subAreafirstLineDrawn = false;
+wallEditor.allVerticesofSubArea = []
+
 // wallEditor.tempArr = []
 const staticComponents = new StaticComponents()
 const mouseClickActivity = new MouseClickActivity()

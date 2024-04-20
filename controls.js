@@ -23,6 +23,7 @@ class MouseClickActivity {
     document.getElementById('wallPatterns').style.display = 'none'
     document.getElementById('colors').style.display = 'none'
     document.getElementById('spaceBetweenLines').style.display = 'none'
+    document.getElementById('subAreaBtn').style.display = 'none'
   }
   toggleBtns2D() {
     document.getElementById('threeDToggleBtn').textContent = 'Change to 3D View'
@@ -33,6 +34,7 @@ class MouseClickActivity {
     document.getElementById('wallPatterns').style.display = 'block'
     document.getElementById('colors').style.display = 'block'
     document.getElementById('spaceBetweenLines').style.display = 'block'
+    document.getElementById('subAreaBtn').style.display = 'block'
   }
 
   onMouseDown(event) {
@@ -62,6 +64,16 @@ class MouseClickActivity {
       this.update(event)
       wallEditor.mousePoints.length = 0
     }
+
+        // Check if the mouse has moved between mousedown and mouseup
+        else if (
+          !wallEditor.is3DView &&
+          wallEditor.isSubAreaActivated
+        ) {
+          // Call addPoint only if the SubAreaActivated
+          this.update(event)
+          wallEditor.mousePoints.length = 0
+        }
 
     // Reset the last mouse down position
     wallEditor.lastMouseDownPosition = null
@@ -108,7 +120,6 @@ class MouseClickActivity {
     if (wallEditor.mousePoints.length >= 2 && !wallEditor.is3DView) {
       staticComponents.addLineData()
       const latestLine = wallEditor.linesArray[wallEditor.linesArray.length - 1]
-
       wallDrawer.draw2DWall(latestLine)
     }
   }
@@ -181,6 +192,26 @@ class MouseClickActivity {
         wallEditor.spaceBetweenLines = parseInt(event.target.value)
         console.log(wallEditor.spaceBetweenLines)
       })
+      document
+      .getElementById('subAreaBtn')
+      .addEventListener('click', () => {
+        wallEditor.isSubAreaActivated = !wallEditor.isSubAreaActivated
+        wallEditor.subAreafirstLineDrawn = false;
+        wallEditor.firstNewP1 = null
+        wallEditor.lastEndPoint = null
+      })
+
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' || event.key === 'Esc') {
+          wallEditor.isSubAreaActivated = false
+
+          wallEditor.subAreafirstLineDrawn = false;
+          wallEditor.firstNewP1 = null
+          wallEditor.lastEndPoint = null
+
+
+        }
+    });
   }
   switchTo3DView() {
     if (wallEditor.is3DView) {
