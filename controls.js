@@ -42,16 +42,32 @@ class MouseClickActivity {
     // temporaryLine.clearTemporaryLine()
     temporaryLine.handleTemporaryLine(event)
     wallEditor.lastMouseDownPosition = { x: event.clientX, y: event.clientY }
+    if (wallEditor.isSubAreaActivated) {
+      wallEditor.wallType = 'subArea'
+    } else {
+      wallEditor.wallType = 'wall'
+    }
   }
   onMouseMove(event) {
-    // if(wallEditor.isMouseDown){
-    //   temporaryLine.clearTemporaryLine()
-    //   console.log('claering')
-    // }
+    if (wallEditor.isMouseDown) {
+      console.log('mouse down')
+
+      // temporaryLine.handleTemporaryLine(event)
+    }
   }
 
   onMouseUp(event) {
     wallEditor.isMouseDown = false
+
+    if (!wallEditor.isMouseDown) {
+      console.log('mouse up')
+    }
+
+    if (wallEditor.isSubAreaActivated) {
+      wallEditor.wallType = 'subArea'
+    } else {
+      wallEditor.wallType = 'wall'
+    }
 
     // Check if the mouse has moved between mousedown and mouseup
     if (
@@ -65,15 +81,12 @@ class MouseClickActivity {
       wallEditor.mousePoints.length = 0
     }
 
-        // Check if the mouse has moved between mousedown and mouseup
-        else if (
-          !wallEditor.is3DView &&
-          wallEditor.isSubAreaActivated
-        ) {
-          // Call addPoint only if the SubAreaActivated
-          this.update(event)
-          wallEditor.mousePoints.length = 0
-        }
+    // Check if the mouse has moved between mousedown and mouseup
+    else if (!wallEditor.is3DView && wallEditor.isSubAreaActivated) {
+      // Call addPoint only if the SubAreaActivated
+      this.update(event)
+      wallEditor.mousePoints.length = 0
+    }
 
     // Reset the last mouse down position
     wallEditor.lastMouseDownPosition = null
@@ -192,26 +205,95 @@ class MouseClickActivity {
         wallEditor.spaceBetweenLines = parseInt(event.target.value)
         console.log(wallEditor.spaceBetweenLines)
       })
-      document
-      .getElementById('subAreaBtn')
-      .addEventListener('click', () => {
-        wallEditor.isSubAreaActivated = !wallEditor.isSubAreaActivated
-        wallEditor.subAreafirstLineDrawn = false;
+    document.getElementById('subAreaBtn').addEventListener('click', () => {
+      wallEditor.wallType = 'subArea'
+      wallEditor.isSubAreaActivated = !wallEditor.isSubAreaActivated
+      wallEditor.isSubAreaCompleted = false
+      wallEditor.subAreafirstLineDrawn = false
+      wallEditor.firstNewP1 = null
+      wallEditor.lastEndPoint = null
+    })
+
+    function removeMeshAndDotsBySubAreaGroupId(subAreaGroupId) {
+      console.log('cameeeeeeee')
+      // Find and remove the mesh and dotsGroup from linesArray
+      wallEditor.linesArray.forEach((line, index) => {
+        if (line.subAreaGroupId === subAreaGroupId) {
+          console.log(line)
+          // Remove mesh from the scene and dispose of it
+
+          wallEditor.scene.remove(line.subAreaOutlineMesh) ////////////////Start form here check geometry varibale spelling and dots vaiable spelling
+          if (line.mesh.geometry) {
+            line.mesh.geometry.dispose()
+          }
+          if (line.mesh.material) {
+            line.mesh.material.dispose()
+          }
+
+          // Remove dotsGroup from dotsGroups and dispose of it
+          if (wallEditor.subAreaDotsGroups[subAreaGroupId]) {
+            wallEditor.subAreaDotsGroups[subAreaGroupId].traverse((object) => {
+              if (object.geometry) {
+                object.geometry.dispose()
+              }
+              if (object.material) {
+                object.material.dispose()
+              }
+            })
+            delete wallEditor.subAreaDotsGroups[subAreaGroupId] // Remove from dotsGroups
+          }
+
+          // Remove line from linesArray
+          wallEditor.linesArray.splice(index, 1)
+        }
+      })
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        if (wallEditor.isSubAreaActivated) {
+          if (!wallEditor.isSubAreaCompleted) {
+            alert('Lines are not completed')
+            removeMeshAndDotsBySubAreaGroupId('1')
+            // let subAreaGroupId = '1'
+
+            // wallEditor.scene.traverse((object) => {
+            //   console.log(object)
+            //   if (
+            //     object.isLineSegments &&
+            //     object.userData &&
+            //     object.userData.wallType === 'subArea'
+            //   ) {
+            //     console.log('This line in the scene is a sub-area line')
+            //   } else if (
+            //     object.isLineSegments &&
+            //     object.userData.wallType === 'wall'
+            //   ) {
+            //     console.log('This line in the scene is a wall line')
+            //   }
+            // })
+            // if (
+            //   object.isLine &&
+            //   object.userData.subAreaGroupId === subAreaGroupId
+            // ) {
+            //   wallEditor.scene.remove(object)
+            //   // Dispose of the geometry and material to free up memory
+            //   object.geometry.dispose()
+            //   object.material.dispose()
+            // }
+          }
+
+          wallEditor.subAreaGroupID = `${
+            parseInt(wallEditor.subAreaGroupID) + 1
+          }`
+        }
+        wallEditor.isSubAreaActivated = false
+
+        wallEditor.subAreafirstLineDrawn = false
         wallEditor.firstNewP1 = null
         wallEditor.lastEndPoint = null
-      })
-
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' || event.key === 'Esc') {
-          wallEditor.isSubAreaActivated = false
-
-          wallEditor.subAreafirstLineDrawn = false;
-          wallEditor.firstNewP1 = null
-          wallEditor.lastEndPoint = null
-
-
-        }
-    });
+      }
+    })
   }
   switchTo3DView() {
     if (wallEditor.is3DView) {

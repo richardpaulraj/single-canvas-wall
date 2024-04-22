@@ -3,37 +3,44 @@ class StaticComponents {
 
   clearScene(scene) {
     scene.children.length = 0
-    wallEditor.dotsGroup.clear();
+    wallEditor.dotsGroup.clear()
     wallEditor.firstNewP1 = null
     wallEditor.lastEndPoint = null
-    wallEditor.subAreafirstLineDrawn = false;
-    wallEditor.allVerticesofSubArea = [];
-  
-    wallEditor.isSubAreaActivated = false;
+    wallEditor.subAreafirstLineDrawn = false
+    wallEditor.allVerticesofSubArea = []
 
-    
+    wallEditor.isSubAreaActivated = false
 
- 
     // wallEditor.tempArr[0].visible = true
     // wallEditor.renderer.render(wallEditor.scene, wallEditor.camera);
     // console.log(wallEditor.linesArray)
-
   }
 
   addLineData(object2D, object3D, visible2D, visible3D) {
     wallEditor.linesArray.push({
+      subAreaGroupID: wallEditor.isSubAreaActivated
+        ? wallEditor.subAreaGroupID
+        : null,
+      subAreaOutlineMesh: wallEditor.isSubAreaActivated
+        ? wallEditor.subAreaOutlineMesh
+        : null,
+      subAreaDotsGroups: wallEditor.isSubAreaActivated
+        ? wallEditor.subAreaDotsGroups
+        : null,
+
       start: wallEditor.mousePoints[wallEditor.mousePoints.length - 2],
       end: wallEditor.mousePoints[wallEditor.mousePoints.length - 1],
       width: wallEditor.currentWidth,
       alignment: wallEditor.currentAlignment,
       color: wallEditor.color,
       wallPatternSpaceBetweenLines: wallEditor.spaceBetweenLines,
-      wallPattern : wallEditor.currentWallPattern,
+      wallPattern: wallEditor.currentWallPattern,
+      wallType: wallEditor.wallType,
 
       object2D,
       object3D,
       visible2D,
-      visible3D
+      visible3D,
     })
   }
 
