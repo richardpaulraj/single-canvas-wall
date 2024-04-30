@@ -66,10 +66,13 @@ wallEditor.controls = new OrbitControls(
 )
 wallEditor.controls.enableRotate = false
 wallEditor.dotsGroup = new THREE.Group()
+wallEditor.lineDots = {};
+wallEditor.spherePosition = {}
+
 
 wallEditor.isSubAreaActivated = false
 wallEditor.subAreaGroup = []
-wallEditor.subAreaGroupID = '1'
+wallEditor.subAreaGroupID = '0'
 wallEditor.currSubAreaStartingPoint = null
 wallEditor.currSubAreaEndingPoint = null
 wallEditor.lastEndPoint = null
@@ -81,6 +84,7 @@ wallEditor.wallType = null
 
 wallEditor.subAreaOutlineMesh = null
 wallEditor.subAreaDotsGroups = null
+// wallEditor.subAreaDotsGroups = []
 // wallEditor.tempArr = []
 const staticComponents = new StaticComponents()
 const mouseClickActivity = new MouseClickActivity()

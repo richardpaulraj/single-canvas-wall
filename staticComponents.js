@@ -2,18 +2,14 @@ class StaticComponents {
   constructor() {}
 
   clearScene(scene) {
-    scene.children.length = 0
-    wallEditor.dotsGroup.clear()
-    wallEditor.firstNewP1 = null
-    wallEditor.lastEndPoint = null
-    wallEditor.subAreafirstLineDrawn = false
-    wallEditor.allVerticesofSubArea = []
+    scene.children.length = 0;
+    wallEditor.dotsGroup.clear();
+    wallEditor.firstNewP1 = null;
+    wallEditor.lastEndPoint = null;
+    wallEditor.subAreafirstLineDrawn = false;
+    wallEditor.allVerticesofSubArea = [];
 
-    wallEditor.isSubAreaActivated = false
-
-    // wallEditor.tempArr[0].visible = true
-    // wallEditor.renderer.render(wallEditor.scene, wallEditor.camera);
-    // console.log(wallEditor.linesArray)
+    wallEditor.isSubAreaActivated = false;
   }
 
   addLineData(object2D, object3D, visible2D, visible3D) {
@@ -24,9 +20,8 @@ class StaticComponents {
       subAreaOutlineMesh: wallEditor.isSubAreaActivated
         ? wallEditor.subAreaOutlineMesh
         : null,
-      subAreaDotsGroups: wallEditor.isSubAreaActivated
-        ? wallEditor.subAreaDotsGroups
-        : null,
+      
+      subAreaDotsGroups: wallEditor.subAreaDotsGroups,
 
       start: wallEditor.mousePoints[wallEditor.mousePoints.length - 2],
       end: wallEditor.mousePoints[wallEditor.mousePoints.length - 1],
@@ -41,19 +36,19 @@ class StaticComponents {
       object3D,
       visible2D,
       visible3D,
-    })
+    });
   }
 
   animate() {
     const animate = () => {
-      requestAnimationFrame(animate)
+      requestAnimationFrame(animate);
       if (wallEditor.controls) {
-        wallEditor.controls.update()
+        wallEditor.controls.update();
       }
-      wallEditor.renderer.render(wallEditor.scene, wallEditor.camera)
-    }
-    animate()
+      wallEditor.renderer.render(wallEditor.scene, wallEditor.camera);
+    };
+    animate();
   }
 }
 
-export default StaticComponents
+export default StaticComponents;

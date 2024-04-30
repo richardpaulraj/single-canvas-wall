@@ -125,3 +125,14 @@ canvas {
   display: block;
   cursor: pointer;
 }
+#tempBtn {
+  position: absolute;
+  top: 370px;
+  left: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  display: block;
+  cursor: pointer;
+}
